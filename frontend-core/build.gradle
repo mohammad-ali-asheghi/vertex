@@ -1,0 +1,47 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = "https://repo.spring.io/release" }
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    id 'com.vaadin' version "${vaadinVersion}"
+}
+
+group = 'com.vertex'
+version = '1.0.0'
+description = 'frontend-core'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { setUrl("https://maven.vaadin.com/vaadin-addons") }
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+dependencies {
+    implementation('com.vaadin:vaadin-spring-boot-starter')
+    developmentOnly('org.springframework.boot:spring-boot-devtools', 'com.vaadin:vaadin-dev')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+    }
+}
