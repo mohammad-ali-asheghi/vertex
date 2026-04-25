@@ -18,10 +18,25 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('SPRING_CLOUD_VERSION', "2025.1.0")
+    set('JASYPT_VERSION', "3.0.5")
+}
+
 dependencies {
+    implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:${JASYPT_VERSION}"
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+    //*DEFAULT*
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //*DEFAULT*
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${SPRING_CLOUD_VERSION}"
+    }
 }
 
 tasks.named('test') {

@@ -1,11 +1,7 @@
 spring:
   application:
-    name: EUREKA-SERVER
-server:
-  port: 7801
+    name: EUREKA-SERVER-TEST
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
     service-url:
       defaultZone: http://localhost:7801/eureka/
