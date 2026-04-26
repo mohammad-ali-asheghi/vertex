@@ -1,16 +1,37 @@
-# Getting Started
+# Config Server
 
-### Reference Documentation
+The Config Server is a Spring Boot service that centralizes external configuration for Vertex services. It runs as a
+Spring Cloud Config Server, reads configuration from a Git-backed repository, and registers itself with Eureka for
+service discovery.
 
-For further reference, please consider the following sections:
+## Responsibilities
 
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/4.0.6/gradle-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/4.0.6/gradle-plugin/packaging-oci-image.html)
+- Exposes centralized configuration through Spring Cloud Config Server endpoints.
+- Loads configuration from a remote Git repository using encrypted connection values.
+- Clones the configuration repository on startup and force-pulls updates to stay synchronized.
+- Registers with Eureka so other services can discover the config server.
+- Exposes actuator endpoints for health checks and refresh operations.
 
-### Additional Links
+## Runtime Configuration
 
-These additional references should also help you:
+- Application name: `CONFIG-SERVER`
+- Server port: `8888`
+- Eureka default zone: `http://localhost:7801/eureka`
+- Git default label: `main`
+- Git repository values and search paths are stored with Jasypt encrypted values.
+- Exposed actuator endpoints: `health`, `refresh`
 
-* [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
+## Main Components
 
+- `ConfigServerApplication` starts the Spring Boot application.
+- `@EnableConfigServer` enables Spring Cloud Config Server behavior.
+- `@EnableDiscoveryClient` enables Eureka discovery registration.
+- `application.yaml` defines the Git backend, server port, Eureka client, and actuator exposure.
+
+## Dependencies
+
+- Spring Boot web starter for HTTP support.
+- Spring Boot actuator for operational endpoints.
+- Spring Cloud Config Server for centralized configuration serving.
+- Spring Cloud Netflix Eureka Client for service discovery.
+- Jasypt Spring Boot starter for encrypted configuration values.
