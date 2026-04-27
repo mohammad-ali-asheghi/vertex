@@ -1,3 +1,6 @@
 spring:
   application:
-    name: gateway-server
+    name: GATEWAY-SERVER
+  config:
+    import:
+      - optional:configserver:http://vertex:8888/

@@ -1,16 +1,49 @@
-# Getting Started
+# Vertex Gateway Server
 
-### Reference Documentation
+Vertex Gateway Server is a reactive API Gateway built with **Spring Cloud Gateway**, designed to act as the entry point
+for the Vertex microservices ecosystem.
 
-For further reference, please consider the following sections:
+It provides centralized routing, service discovery integration, and externalized configuration through Spring Cloud
+Config.
 
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/4.0.6/gradle-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/4.0.6/gradle-plugin/packaging-oci-image.html)
+---
 
-### Additional Links
+# Tech Stack
 
-These additional references should also help you:
+- Java 21
+- Spring Boot 4.0.6
+- Spring Cloud 2025.1.0
+- Spring Cloud Gateway (WebFlux)
+- Spring Cloud Config Client
+- Netflix Eureka Client
+- Gradle
+- Lombok
 
-* [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
+---
 
+# Project Information
+
+Group: `com.vertex`  
+Artifact: `gateway-server`  
+Version: `1.0.0`
+
+The gateway is responsible for:
+
+- Routing requests to internal services
+- Integrating with service discovery (Eureka)
+- Fetching centralized configuration from Config Server
+- Providing operational metrics via Actuator
+- Acting as the single entry point to the microservice architecture
+
+---
+
+# Java Configuration
+
+The project uses **Java Toolchains** to enforce Java 21.
+
+```gradle
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
