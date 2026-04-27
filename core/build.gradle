@@ -1,7 +1,17 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'maven-publish'
     id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+    archiveClassifier.set('')
 }
 
 group = 'com.vertex'
@@ -14,16 +24,57 @@ java {
     }
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    api "org.springframework.data:spring-data-commons:${springDataCommonsVersion}"
+    api "tools.jackson.core:jackson-databind:${jacksonVersion}"
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    //*DEFAULT
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //*DEFAULT
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "nexus"
+            url = uri("http://localhost:7900/repository/maven-releases/")
+            allowInsecureProtocol = true
+
+            credentials {
+                username = project.findProperty("nexus_username") ?: "admin"
+                password = project.findProperty("nexus_password") ?: "admin"
+            }
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.addAll([
+            '-parameters',
+            '-Amapstruct.suppressGeneratorTimestamp=true',
+            '-Amapstruct.defaultComponentModel=spring'
+    ])
 }
