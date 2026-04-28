@@ -1,0 +1,20 @@
+[
+  {
+    "id": "DE_UUID_00001",
+    "codeTypeId": "DE_UUID_00001",
+    "farsiTitle": "کاربر سازمان",
+    "englishTitle": "ORGANIZATION_USER",
+    "priority": 1,
+    "description": "",
+    "isDisable": false
+  },
+  {
+    "id": "DE_UUID_00002",
+    "codeTypeId": "DE_UUID_00001",
+    "farsiTitle": "کاربر صنعت",
+    "englishTitle": "COMPANY_USER",
+    "priority": 2,
+    "description": "",
+    "isDisable": false
+  }
+]

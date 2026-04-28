@@ -36,10 +36,12 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.mapstruct:mapstruct:${mapStructVersion}"
     api "org.springframework.data:spring-data-commons:${springDataCommonsVersion}"
     api "tools.jackson.core:jackson-databind:${jacksonVersion}"
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapStructVersion}"
     //*DEFAULT
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
