@@ -6,7 +6,8 @@ buildscript {
 }
 
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'maven-publish'
     id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
     id 'com.vaadin' version "${vaadinVersion}"
@@ -16,13 +17,38 @@ group = 'com.vertex'
 version = '1.0.0'
 description = 'frontend-core'
 
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+    archiveClassifier.set('')
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 repositories {
+    maven {
+        name = "nexus"
+        url = uri("http://localhost:7900/repository/maven-releases/")
+        allowInsecureProtocol = true
+
+        credentials {
+            username = project.findProperty("nexus_username") ?: "admin"
+            password = project.findProperty("nexus_password") ?: "admin"
+        }
+    }
     mavenCentral()
     maven { setUrl("https://maven.vaadin.com/vaadin-addons") }
 }
@@ -35,13 +61,55 @@ configurations {
 }
 
 dependencies {
+    implementation "com.vertex:core:${coreVersion}"
+    api 'com.vaadin:vaadin'
+    api 'com.vaadin:vaadin-spring-boot-starter'
+    api 'org.springframework.boot:spring-boot-starter-web'
+    api 'org.springframework.cloud:spring-cloud-starter-config'
+    api 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    api 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    api 'org.springframework.boot:spring-boot-starter-data-redis'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    developmentOnly 'com.vaadin:vaadin-dev'
+    //*DEFAULT
     implementation('com.vaadin:vaadin-spring-boot-starter')
     developmentOnly('org.springframework.boot:spring-boot-devtools', 'com.vaadin:vaadin-dev')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
+    //*DEFAULT
 }
 
 dependencyManagement {
     imports {
-        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
     }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "nexus"
+            url = uri("http://localhost:7900/repository/maven-releases/")
+            allowInsecureProtocol = true
+
+            credentials {
+                username = project.findProperty("nexus_username") ?: "admin"
+                password = project.findProperty("nexus_password") ?: "admin"
+            }
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.addAll([
+            '-parameters',
+            '-Amapstruct.suppressGeneratorTimestamp=true',
+            '-Amapstruct.defaultComponentModel=spring'
+    ])
 }

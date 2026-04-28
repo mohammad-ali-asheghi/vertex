@@ -46,7 +46,7 @@ repositories {
 
 dependencies {
     implementation "org.mapstruct:mapstruct:${mapStructVersion}"
-    api "com.vertex:core:${coreVersion}"
+    implementation "com.vertex:core:${coreVersion}"
     api 'org.springframework.boot:spring-boot-starter-actuator'
     api 'org.springframework.boot:spring-boot-starter-web'
     api 'org.springframework.cloud:spring-cloud-starter-config'
