@@ -61,6 +61,7 @@ dependencies {
     api 'org.springframework.boot:spring-boot-starter-data-jpa'
     api 'org.springframework.boot:spring-boot-starter-security'
     api 'org.springframework.security:spring-security-acl'
+    api "com.github.ulisesbocchio:jasypt-spring-boot-starter:${jasyptVersion}"
     api "nl.basjes.parse.useragent:yauaa:${userAgentVersion}"
     api "io.jsonwebtoken:jjwt-api:${jwtVersion}"
     api('com.redis.om:redis-om-spring:' + redisOmVersion) {

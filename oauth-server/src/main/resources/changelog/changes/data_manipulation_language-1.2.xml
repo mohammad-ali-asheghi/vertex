@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <property name="now" value="UNIX_TIMESTAMP()" dbms="mysql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <property name="now" value="now()" dbms="postgresql"/>
+
+    <changeSet id="dml-1.1-14050105-1130-dev" author="dev">
+        <insert tableName="application">
+            <column name="id" value="1"/>
+            <column name="name" value="oauth-service"/>
+            <column name="title" value="سامانه مدیریت کاربران"/>
+            <column name="url" value="oauth"/>
+            <column name="create_user" value="data-entry"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="dml-1.1-14050105-1140-dev" author="dev">
+        <insert tableName="sec_menu">
+            <column name="id" value="1"/>
+            <column name="version" value="0"/>
+            <column name="priority" value="1"/>
+            <column name="search_key" value="oauth-service"/>
+            <column name="title" value="سامانه مدیریت کاربران"/>
+            <column name="create_user" value="data-entry"/>
+            <column name="is_active" value="true"/>
+            <column name="application_id" value="1"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="dml-1.1-14050120-1700-dev" author="dev">
+        <insert tableName="sec_menu">
+            <column name="id" value="2"/>
+            <column name="version" value="0"/>
+            <column name="priority" value="1"/>
+            <column name="search_key" value="application"/>
+            <column name="title" value="مدیریت سامانه ها"/>
+            <column name="create_user" value="data-entry"/>
+            <column name="is_active" value="true"/>
+            <column name="application_id" value="1"/>
+            <column name="parent_id" value="1"/>
+        </insert>
+
+        <insert tableName="sec_menu">
+            <column name="id" value="3"/>
+            <column name="version" value="0"/>
+            <column name="priority" value="2"/>
+            <column name="search_key" value="role"/>
+            <column name="title" value="مدیریت نقش ها"/>
+            <column name="create_user" value="data-entry"/>
+            <column name="is_active" value="true"/>
+            <column name="application_id" value="1"/>
+            <column name="parent_id" value="1"/>
+        </insert>
+
+        <insert tableName="sec_menu">
+            <column name="id" value="4"/>
+            <column name="version" value="0"/>
+            <column name="priority" value="3"/>
+            <column name="search_key" value="user"/>
+            <column name="title" value="مدیریت کاربران"/>
+            <column name="create_user" value="data-entry"/>
+            <column name="is_active" value="true"/>
+            <column name="application_id" value="1"/>
+            <column name="parent_id" value="1"/>
+        </insert>
+
+        <insert tableName="sec_menu">
+            <column name="id" value="5"/>
+            <column name="version" value="0"/>
+            <column name="priority" value="4"/>
+            <column name="search_key" value="constant"/>
+            <column name="title" value="مدیریت ثابت ها"/>
+            <column name="create_user" value="data-entry"/>
+            <column name="is_active" value="true"/>
+            <column name="application_id" value="1"/>
+            <column name="parent_id" value="1"/>
+        </insert>
+
+        <insert tableName="sec_menu">
+            <column name="id" value="6"/>
+            <column name="version" value="0"/>
+            <column name="priority" value="5"/>
+            <column name="search_key" value="menu"/>
+            <column name="title" value="مدیریت منو ها"/>
+            <column name="create_user" value="data-entry"/>
+            <column name="is_active" value="true"/>
+            <column name="application_id" value="1"/>
+            <column name="parent_id" value="1"/>
+        </insert>
+
+        <insert tableName="sec_menu">
+            <column name="id" value="7"/>
+            <column name="version" value="0"/>
+            <column name="priority" value="6"/>
+            <column name="search_key" value="permission"/>
+            <column name="title" value="مدیریت مجوز ها"/>
+            <column name="create_user" value="data-entry"/>
+            <column name="is_active" value="true"/>
+            <column name="application_id" value="1"/>
+            <column name="parent_id" value="1"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

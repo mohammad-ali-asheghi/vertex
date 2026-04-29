@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <property name="now" value="UNIX_TIMESTAMP()" dbms="mysql"/>
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <property name="now" value="now()" dbms="postgresql"/>
+
+    <changeSet id="create-global-seq" author="dev">
+        <createSequence
+                sequenceName="global_seq"
+                startValue="25000"
+                incrementBy="1"/>
+    </changeSet>
+
+    <changeSet id="ddl-1.2-14050105-1115-dev" author="dev">
+        <createTable tableName="application" remarks="لیست سرویس‌ها و اپلیکیشن‌ها">
+            <column name="id" type="BIGINT" remarks="شناسه اپلیکیشن">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_application_id"/>
+            </column>
+            <column name="name" type="VARCHAR(255)" remarks="نام سیستمی سرویس (Service Name)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)" remarks="عنوان فارسی سرویس">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="VARCHAR(255)" remarks="آدرس پایه سرویس (Base URL)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- فیلدهای مشترک از کلاس PO -->
+            <column name="create_user" type="VARCHAR(255)"/>
+            <column name="create_date" type="TIMESTAMP(6)" defaultValueComputed="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_user" type="VARCHAR(255)"/>
+            <column name="update_date" type="TIMESTAMP(6)"/>
+            <column name="version" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- ایجاد ایندکس یکتا بر روی فیلد name مطابق با تنظیمات Entity -->
+        <addUniqueConstraint tableName="application"
+                             columnNames="name"
+                             constraintName="uk_application_name"/>
+    </changeSet>
+
+    <changeSet id="ddl-1.2-14050105-1120-dev" author="dev">
+        <createTable tableName="sec_menu" remarks="منوهای سیستم">
+            <column name="id" type="BIGINT" remarks="شناسه منو">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_menu_id"/>
+            </column>
+            <column name="title" type="VARCHAR(255)" remarks="عنوان منو">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon" type="VARCHAR(255)" remarks="آیکن منو"/>
+            <column name="search_key" type="VARCHAR(255)" remarks="کلید جستجو">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="description" type="TEXT" remarks="توضیحات منو"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true" remarks="وضعیت فعال/غیر فعال"/>
+            <column name="parent_id" type="BIGINT" remarks="شناسه منوی والد"/>
+            <column name="priority" type="INTEGER" remarks="اولویت نمایش منو"/>
+            <column name="application_id" type="BIGINT" remarks="شناسه برنامه"/>
+            <column name="is_system_data_entry" type="BOOLEAN" remarks="آیا داده‌های این ردیف سیستمی هستند؟"/>
+
+            <!-- فیلدهای مشترک از کلاس PO -->
+            <column name="create_user" type="VARCHAR(255)"/>
+            <column name="create_date" type="TIMESTAMP(6)" defaultValueComputed="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_user" type="VARCHAR(255)"/>
+            <column name="update_date" type="TIMESTAMP(6)"/>
+            <column name="version" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- کلید خارجی به منوی والد (در همان جدول) -->
+        <addForeignKeyConstraint
+                baseTableName="sec_menu"
+                baseColumnNames="parent_id"
+                constraintName="fk_sec_menu_parent"
+                referencedTableName="sec_menu"
+                referencedColumnNames="id"
+                onDelete="SET NULL"/>
+
+        <!-- کلید خارجی به جدول برنامه‌ها -->
+        <addForeignKeyConstraint
+                baseTableName="sec_menu"
+                baseColumnNames="application_id"
+                constraintName="fk_sec_menu_to_app"
+                referencedTableName="application"
+                referencedColumnNames="id"
+                onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="ddl-1.2-14050105-1130-dev" author="dev">
+        <createTable tableName="sec_user_info" remarks="اطلاعات تکمیلی کاربران">
+            <column name="id" type="BIGINT" remarks="شناسه اطلاعات کاربری">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_user_info_id"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)" remarks="نام"/>
+            <column name="last_name" type="VARCHAR(255)" remarks="نام خانوادگی"/>
+            <column name="national_no" type="VARCHAR(10)" remarks="کد ملی">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="user_info_type_code_type_item_id" type="VARCHAR(255)" remarks="شناسه نوع اطلاعات کاربری">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mobile_number" type="VARCHAR(15)" remarks="شماره موبایل">
+                <constraints unique="true"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(15)" remarks="شماره تلفن ثابت"/>
+            <column name="finger_print" type="TEXT" remarks="دیتا یا هش اثر انگشت"/>
+
+            <!-- فیلدهای مشترک از کلاس PO -->
+            <column name="create_user" type="VARCHAR(255)"/>
+            <column name="create_date" type="TIMESTAMP(6)" defaultValueComputed="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_user" type="VARCHAR(255)"/>
+            <column name="update_date" type="TIMESTAMP(6)"/>
+            <column name="version" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="ddl-1.2-14050105-1135-dev" author="dev">
+        <createTable tableName="sec_user" remarks="کاربران">
+            <column name="id" type="BIGINT" remarks="شناسه کاربران">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_user_id"/>
+            </column>
+            <column name="username" type="VARCHAR(255)" remarks="نام کاربری">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)" remarks="رمز عبور">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true" remarks="وضعیت">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_expire_date" type="TIMESTAMP(6)" remarks="تاریخ منقضی شدن رمز عبور"/>
+            <column name="login_attempt_number" type="INTEGER" remarks="تعداد دفعات ورود"/>
+            <column name="unlock_date" type="TIMESTAMP(6)" remarks="تاریخ فعال سازی مجدد کاربر"/>
+            <column name="expire_date" type="TIMESTAMP(6)" remarks="تاریخ منقضی شدن کاربر"/>
+            <column name="last_update" type="VARCHAR(255)" remarks="اخرین وضعیت ویرایش"/>
+            <column name="user_info_id" type="BIGINT" remarks="شناسه اطلاعات کاربری"/>
+
+            <!-- فیلدهای مشترک از کلاس PO -->
+            <column name="create_user" type="VARCHAR(255)"/>
+            <column name="create_date" type="TIMESTAMP(6)" defaultValueComputed="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_user" type="VARCHAR(255)"/>
+            <column name="update_date" type="TIMESTAMP(6)"/>
+            <column name="version" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="sec_user"
+                                 baseColumnNames="user_info_id"
+                                 constraintName="fk_user_to_user_info"
+                                 referencedTableName="sec_user_info"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="ddl-1.2-14050105-1210-dev" author="dev">
+        <createTable tableName="sec_role" remarks="نقش‌های سیستمی">
+            <column name="id" type="BIGINT" remarks="شناسه نقش">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_role_id"/>
+            </column>
+            <column name="name" type="VARCHAR(255)" remarks="نام انگلیسی نقش (مثلا ROLE_ADMIN)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alias_name" type="VARCHAR(255)" remarks="نام مستعار یا فارسی نقش">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(500)" remarks="توضیحات نقش"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true" remarks="وضعیت فعال بودن"/>
+            <column name="application_id" type="BIGINT" remarks="شناسه اپلیکیشن مرتبط">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- فیلدهای مشترک از کلاس PO -->
+            <column name="create_user" type="VARCHAR(255)"/>
+            <column name="create_date" type="TIMESTAMP(6)" defaultValueComputed="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_user" type="VARCHAR(255)"/>
+            <column name="update_date" type="TIMESTAMP(6)"/>
+            <column name="version" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- ایجاد محدودیت یکتا برای نام نقش (مطابق با UniqueConstraint در کد) -->
+        <addUniqueConstraint tableName="sec_role"
+                             columnNames="name"
+                             constraintName="uk_role_name"/>
+
+        <!-- ایجاد رابطه با جدول application -->
+        <addForeignKeyConstraint baseTableName="sec_role"
+                                 baseColumnNames="application_id"
+                                 constraintName="fk_role_to_application"
+                                 referencedTableName="application"
+                                 referencedColumnNames="id"
+                                 onDelete="RESTRICT"/>
+    </changeSet>
+
+    <changeSet id="ddl-1.2-14050105-1220-dev" author="dev">
+        <createTable tableName="permission" remarks="جدول سطوح دسترسی منوها">
+            <column name="id" type="BIGINT" remarks="شناسه دسترسی">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_permission_id"/>
+            </column>
+            <column name="role" type="VARCHAR(255)" remarks="نام یا کد نقش مرتبط">
+                <constraints nullable="false"/>
+            </column>
+            <column name="menu_id" type="BIGINT" remarks="شناسه منوی مرتبط">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission" type="integer" defaultValueNumeric="0" remarks="مقدار عددی سطح دسترسی">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- فیلدهای اختصاصی این انتیتی (Auditing) -->
+            <column name="create_user" type="VARCHAR(255)" remarks="ایجاد کننده"/>
+            <column name="device" type="VARCHAR(255)" remarks="دستگاه استفاده شده"/>
+            <column name="user_ip" type="VARCHAR(45)" remarks="آدرس آی‌پی کاربر"/>
+        </createTable>
+
+        <createIndex tableName="permission" indexName="idx_permission_role">
+            <column name="role"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="ddl-1.2-14050105-1230-dev" author="dev">
+        <createTable tableName="sec_users_roles" remarks="جدول واسط کاربر و نقش">
+            <column name="id" type="BIGINT" remarks="شناسه رابطه">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_users_roles_id"/>
+            </column>
+            <column name="user_id" type="BIGINT" remarks="شناسه کاربر">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT" remarks="شناسه نقش">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- فیلدهای مشترک از کلاس PO -->
+            <column name="create_user" type="VARCHAR(255)"/>
+            <column name="create_date" type="TIMESTAMP(6)" defaultValueComputed="${now}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_user" type="VARCHAR(255)"/>
+            <column name="update_date" type="TIMESTAMP(6)"/>
+            <column name="version" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- جلوگیری از تخصیص نقش تکراری به یک کاربر -->
+        <addUniqueConstraint tableName="sec_users_roles"
+                             columnNames="user_id, role_id"
+                             constraintName="uk_user_role_unique"/>
+
+        <!-- ایجاد روابط خارجی -->
+        <addForeignKeyConstraint baseTableName="sec_users_roles"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_user_role_to_user"
+                                 referencedTableName="sec_user"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="sec_users_roles"
+                                 baseColumnNames="role_id"
+                                 constraintName="fk_user_role_to_role"
+                                 referencedTableName="sec_role"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="ddl-1.2-14050121-1400-dev" author="dev" runOnChange="true">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="permission"/>
+            <tableExists tableName="sec_role"/>
+        </preConditions>
+
+        <createView viewName="view_permission" replaceIfExists="true">
+        <![CDATA[
+            SELECT p.id,
+                   p.role,
+                   p.menu_id,
+                   sm.title AS menu_title,
+                   p.permission,
+                   sr.alias_name,
+                   sr.id    AS role_id
+            FROM permission p
+                     INNER JOIN sec_role sr ON p.role = sr.name
+                     INNER JOIN sec_menu sm ON p.menu_id = sm.id
+            ]]>
+        </createView>
+    </changeSet>
+
+    <changeSet id="ddl-1.2-14050131-1200-dev" author="dev" runOnChange="true">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="sec_menu"/>
+        </preConditions>
+
+        <createView viewName="view_sec_menu" replaceIfExists="true">
+        <![CDATA[
+            SELECT s.id,
+                   s.icon,
+                   s.title,
+                   s.application_id,
+                   s.search_key,
+                   s.is_active,
+                   s.is_system_data_entry,
+                   s.parent_id,
+                   exists(SELECT 1 FROM sec_menu x WHERE x.parent_id = s.id) AS has_child,
+                   s.priority
+            FROM sec_menu s
+            ]]>
+        </createView>
+    </changeSet>
+
+</databaseChangeLog>

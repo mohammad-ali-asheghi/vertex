@@ -1,3 +1,6 @@
 spring:
   application:
-    name: oauth-server
+    name: OAUTH-SERVER
+  config:
+    import:
+      - optional:configserver:http://vertex:8888/
