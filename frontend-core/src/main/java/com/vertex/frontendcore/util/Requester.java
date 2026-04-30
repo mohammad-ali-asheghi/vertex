@@ -1,6 +1,10 @@
 package com.vertex.frontendcore.util;
 
 import com.vaadin.flow.component.UI;
+import com.vertex.core.enums.ResponseCode;
+import com.vertex.core.util.PagedResponse;
+import com.vertex.core.util.ResponseMessage;
+import com.vertex.core.util.RestResponse;
 import com.vertex.frontendcore.auth.AuthManager;
 import com.vertex.frontendcore.constant.Routing;
 import feign.FeignException;
@@ -22,6 +26,27 @@ public final class Requester {
 
     private Requester() {
         throw new UnsupportedOperationException("Utility class");
+    }
+
+    public static <T> T executeAndUnwrap(Supplier<RestResponse<T>> supplier) {
+        RestResponse<T> response = execute(supplier);
+        if (response != null && response.getData() != null) {
+            return response.getData();
+        }
+        return null;
+    }
+
+    public static <E> PagedResponse<E> executePaged(Supplier<PagedResponse<E>> supplier) {
+        PagedResponse<E> response = execute(supplier);
+        if (response != null && response.getResultList() != null) {
+            return response;
+        }
+        return null;
+    }
+
+    public static boolean executeAndCheck(Supplier<ResponseMessage> supplier) {
+        ResponseMessage response = execute(supplier);
+        return response != null && response.getCode() == ResponseCode.SUCCESS.getCode();
     }
 
     public static <T> T execute(Supplier<T> supplier) {

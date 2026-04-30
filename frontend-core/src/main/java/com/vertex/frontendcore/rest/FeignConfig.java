@@ -17,7 +17,7 @@ public class FeignConfig {
         return template -> {
             String url = template.url();
 
-            if (url.endsWith("/v1/token")) {
+            if (url.endsWith("/v1/token") || url.endsWith("/v1/captcha")) {
                 return;
             }
 

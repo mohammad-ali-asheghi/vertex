@@ -14,4 +14,5 @@ public class CommonConstant {
     public static final String PRIVATE_KEY = "migration:hash:key:private_key";
     public static final String PERMISSIONS = "migration:hash";
     public static final String INSTANCE_KEY = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+    public static final String CAPTCHA = "CAPTCHA:";
 }

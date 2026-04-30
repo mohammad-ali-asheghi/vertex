@@ -35,7 +35,7 @@ public class BindingException extends RuntimeException {
     public void addError(int code, String errorMessage) {
         String oldErrorMessage = errorMessage;
         try {
-            errorMessage = MessageProvider.getMessageByKey(errorMessage);
+            errorMessage = MessageProvider.getMessage(errorMessage);
         } catch (Exception ignored) {
         }
         errorMessage = StringUtil.isEmpty(errorMessage) ? oldErrorMessage : errorMessage;

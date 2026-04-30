@@ -1,1 +1,5 @@
+//todo: develop mode
+includeBuild '/home/dev/workspace/vertex/core'
+includeBuild '/home/dev/workspace/vertex/backend-core'
+//develop mode
 rootProject.name = 'oauth'

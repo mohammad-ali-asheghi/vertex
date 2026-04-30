@@ -1,43 +1,29 @@
 package com.vertex.core.config;
 
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.MissingResourceException;
 
 @SuppressWarnings("unused")
 @Component
 public class MessageProvider {
 
-    private static final String location = "fa";
+    private static MessageSource messageSource;
 
-    public MessageProvider() {
+    public MessageProvider(MessageSource messageSource) {
+        MessageProvider.messageSource = messageSource;
     }
 
-    public String getMessage(String key) {
-        try {
-            java.util.ResourceBundle resourceBundle = java.util.ResourceBundle.getBundle("messages", Locale.forLanguageTag("fa"));
-            return resourceBundle.getString(key);
-        } catch (MissingResourceException var3) {
-            return var3.getMessage();
-        }
+    public static String getMessage(String key) {
+        return messageSource.getMessage(key, null, key, getCurrentLocale());
     }
 
-    public static String getMessageByKey(String key) {
-        try {
-            java.util.ResourceBundle resourceBundle = java.util.ResourceBundle.getBundle("messages", Locale.forLanguageTag("fa"));
-            return resourceBundle.getString(key);
-        } catch (MissingResourceException var2) {
-            return var2.getMessage();
-        }
+    public static String getMessage(String key, Object... args) {
+        return messageSource.getMessage(key, args, key, getCurrentLocale());
     }
 
-    public static String getMessageByKeyAndParam(String key, String... paramValue) {
-        java.util.ResourceBundle resourceBundle = java.util.ResourceBundle.getBundle("messages", Locale.forLanguageTag("fa"));
-        String msgValue = resourceBundle.getString(key);
-        MessageFormat messageFormat = new MessageFormat(msgValue);
-        return messageFormat.format(paramValue);
+    private static Locale getCurrentLocale() {
+        return Locale.of("fa", "IR");
     }
 }
-

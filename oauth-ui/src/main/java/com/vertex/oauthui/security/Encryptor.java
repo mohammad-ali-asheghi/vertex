@@ -25,7 +25,7 @@ public class Encryptor {
 
     private final StringRedisTemplate redisTemplate;
 
-    public String encryptData(String username, String password) {
+    public String encryptData(String username, String password, String captchaId, String captchaAnswer) {
         try {
             String publicKeyBase64 = redisTemplate.opsForValue().get(CommonConstant.PUBLIC_KEY);
 
@@ -36,7 +36,15 @@ public class Encryptor {
             Cipher cipher = Cipher.getInstance(CommonConstant.INSTANCE_KEY);
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
-            String dataToEncrypt = username + "|" + password + "|" + LocalDateTime.now();
+            String dataToEncrypt = username +
+                    "|" +
+                    password +
+                    "|" +
+                    LocalDateTime.now() +
+                    "|" +
+                    captchaId +
+                    "|" +
+                    captchaAnswer;
             byte[] encryptedBytes = cipher.doFinal(dataToEncrypt.getBytes(StandardCharsets.UTF_8));
 
             return Base64.getEncoder().encodeToString(encryptedBytes);
