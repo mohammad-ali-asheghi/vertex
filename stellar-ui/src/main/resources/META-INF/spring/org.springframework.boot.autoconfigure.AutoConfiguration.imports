@@ -1,0 +1,5 @@
+com.vertex.stellarui.config.RedisCacheConfig
+com.vertex.stellarui.config.CustomI18NProvider
+com.vertex.stellarui.config.ApplicationServiceInitListener
+com.vertex.stellarui.rest.FeignConfig
+com.vertex.stellarui.AppShell
