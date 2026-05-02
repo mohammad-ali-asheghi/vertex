@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: OAUTH-UI-SERVICE
+  config:
+    import:
+      - optional:configserver:http://vertex:8888/

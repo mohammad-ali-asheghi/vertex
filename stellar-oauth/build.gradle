@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    id 'com.vaadin' version "${vaadinVersion}"
+}
+
+group = 'com.vertex'
+version = '1.0.0'
+description = 'stellar-oauth'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    maven {
+        name = "nexus"
+        url = uri("http://localhost:7900/repository/maven-releases/")
+        allowInsecureProtocol = true
+
+        credentials {
+            username = project.findProperty("nexus_username") ?: "admin"
+            password = project.findProperty("nexus_password") ?: "admin"
+        }
+    }
+    mavenCentral()
+    maven { setUrl("https://maven.vaadin.com/vaadin-addons") }
+}
+
+dependencies {
+    implementation 'com.vertex:core:' + coreVersion
+    implementation 'com.vertex:stellar-ui:' + stellarUiVersion
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
