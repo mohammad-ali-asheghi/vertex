@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends AbstractDAO<UserEntity> {
 
-    Optional<UserEntity> findUsersByUsername(String username);
+    Optional<UserEntity> findByUsername(String email);
 
     Boolean existsByUsername(String username);
 }
