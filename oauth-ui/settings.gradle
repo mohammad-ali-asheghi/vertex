@@ -7,4 +7,5 @@ pluginManagement {
         id 'com.vaadin' version "${vaadinVersion}"
     }
 }
+includeBuild '/home/dev/workspace/vertex/frontend-core'
 rootProject.name = 'oauth-ui'
