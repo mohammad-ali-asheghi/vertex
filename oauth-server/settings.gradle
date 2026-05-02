@@ -1,2 +1,3 @@
 includeBuild '/home/dev/workspace/vertex/backend-core'
+includeBuild '/home/dev/workspace/vertex/core'
 rootProject.name = 'oauth'

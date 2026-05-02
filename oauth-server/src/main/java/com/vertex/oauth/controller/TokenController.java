@@ -65,7 +65,7 @@ public class TokenController implements TokenApi {
             );
             SecurityContextHolder.getContext().setAuthentication(authenticate);
         } catch (Exception e) {
-            throw new ServiceException(MessageProvider.getMessage("Unauthorized"));
+            throw new ServiceException(MessageProvider.getMessageByKey("Unauthorized"));
         }
         return RestResponse.ok(new TokenResponse(jwtTokenProvider.generateToken(si.username, request)));
     }
@@ -84,18 +84,18 @@ public class TokenController implements TokenApi {
 
     private void validateCaptcha(String captchaId, String captchaAnswer) {
         if (captchaId == null || captchaAnswer == null) {
-            throw new ServiceException(MessageProvider.getMessage("CaptchaIsRequired"));
+            throw new ServiceException(MessageProvider.getMessageByKey("CaptchaIsRequired"));
         }
 
         String cacheKey = CommonConstant.CAPTCHA + captchaId;
         String expectedAnswer = cacheService.getCacheByKey(cacheKey);
 
         if (expectedAnswer == null) {
-            throw new ServiceException(MessageProvider.getMessage("CaptchaTimeout"));
+            throw new ServiceException(MessageProvider.getMessageByKey("CaptchaTimeout"));
         }
 
         if (!expectedAnswer.equals(captchaAnswer)) {
-            throw new ServiceException(MessageProvider.getMessage("CaptchaNotMatch"));
+            throw new ServiceException(MessageProvider.getMessageByKey("CaptchaNotMatch"));
         }
 
         cacheService.deleteCache(cacheKey);
@@ -113,7 +113,7 @@ public class TokenController implements TokenApi {
         LocalDateTime requestTime = LocalDateTime.parse(data[2]);
 
         if (requestTime.isAfter(LocalDateTime.now().plusSeconds(expirationRequestTime)))
-            throw new ServiceException(MessageProvider.getMessage("RequestTimeout"));
+            throw new ServiceException(MessageProvider.getMessageByKey("RequestTimeout"));
 
         String captchaId = data.length > 3 ? data[3] : null;
         String captchaAnswer = data.length > 4 ? data[4] : null;
