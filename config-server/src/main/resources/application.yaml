@@ -1,17 +1,16 @@
 spring:
   application:
     name: CONFIG-SERVER
+  profiles:
+    active:
+      - native
   cloud:
     config:
+      name: vertex
       server:
-        git:
-          uri: ENC(UP5obuLAwrp8RUjA3MuRIket/VKudSu2QbB/icM+Ed1Rgm6uxNxxSkbMxSwvhWdIlbYl7OZw4EgNRYcNvAj59JZ9e0xRR292YcmzHyBJWRw=)
-          username: mohammad-ali-asheghi
-          password: ENC(Hhn69rINe79VDvDualHnd6DRtSdghrz7KbzGCSxIk0z4KObQwXVaM7k2RjUb1Re1FWrJNuI9d6FjeN7t2bquKcNogpwg62KV8fEXW2oaUTSd85230WysIg/4V+qeJGrmgZP5zM6a7Oq6nf+EbpfTPanWJna5Be1M5fXROg6UdFA=)
-          force-pull: true
-          clone-on-start: true
-          default-label: main
-          search-paths: ENC(TzY5DmyefzG47h4AVcp0pxNYTBrWOCF00LSvgxmJgDUEml3RSKjQVHGRAyljUEGc)
+        native:
+          search-locations:
+            - ENC(trK06WjYBgVn/GJf656xL+NhLb0tLOWobVooyI9l3CBgHNJz1K6Nah0+aXCIBFMlGxmZE7CNiJYE0E400lyg5qArHHoPQswKNfchLhTofcM=)
 
 server:
   port: 8888

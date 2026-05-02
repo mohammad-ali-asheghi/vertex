@@ -2,3 +2,4 @@ com.vertex.frontendcore.config.RedisCacheConfig
 com.vertex.frontendcore.config.CustomI18NProvider
 com.vertex.frontendcore.config.ApplicationServiceInitListener
 com.vertex.frontendcore.rest.FeignConfig
+com.vertex.frontendcore.AppShell

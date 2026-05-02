@@ -5,6 +5,7 @@ import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.server.AppShellSettings;
 import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.theme.aura.Aura;
 
 /**
  * Use the @PWA annotation make the application installable on phones, tablets
@@ -12,7 +13,8 @@ import com.vaadin.flow.server.PWA;
  */
 @Push
 @PWA(name = "Vertex Base for Vaadin", shortName = "Vertex Base")
-@StyleSheet("styles.css")
+@StyleSheet("core.css")
+@StyleSheet(Aura.STYLESHEET)
 public class AppShell implements AppShellConfigurator {
 
     @Override
