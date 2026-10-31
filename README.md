@@ -1,228 +1,222 @@
-## 🛠 Prerequisites Installation
+# 🌌 Vertex Platform — اکوسیستم جامع میکروسرویس و پنل مدیریت وادین
 
-### Java (JDK 17)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg?logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen.svg?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2025.1.0-blue.svg?logo=spring&logoColor=white)](https://spring.io/projects/spring-cloud)
+[![Vaadin](https://img.shields.io/badge/Vaadin-25.1.3-blueviolet.svg?logo=vaadin&logoColor=white)](https://vaadin.com/)
+[![Architecture](https://img.shields.io/badge/Architecture-Microservices%20%26%20MFE-success.svg)](#معماری-سیستم)
+[![Security](https://img.shields.io/badge/Security-OAuth2%20%7C%20JWT%20%7C%20RBAC-red.svg)](#امنیت-و-چرخه-حیات-توکن)
 
-# Manual Java configuration on Linux
+---
+
+## 📖 فهرست مطالب
+
+1. [نمای کلی پروژه](#-نمای-کلی-پروژه)
+2. [معماری سیستم و میکروسرویس‌ها](#-معماری-سیستم-و-میکروسرویسها)
+3. [ماژول‌ها و وظایف هر سرویس](#-ماژولها-و-وظایف-هر-سرویس)
+4. [صفحات پیاده‌سازی شده پنل مدیریت](#-صفحات-پیادهسازی-شده-پنل-مدیریت)
+5. [امنیت و چرخه حیات توکن‌ها](#-امنیت-و-چرخه-حیات-توکنها)
+6. [طراحی رابط کاربری و تجربه کاربری (UI/UX)](#-طراحی-رابط-کاربری-و-تجربه-کاربری-uiux)
+7. [راهنمای راه‌اندازی و اجرا](#-راهنمای-راهاندازی-و-اجرا)
+8. [مستندات تکمیلی و DevOps](#-مستندات-تکمیلی-و-devops)
+
+---
+
+## 🌟 نمای کلی پروژه
+
+پروژه **Vertex** یک پلتفرم جامع و توزیع‌شده با معماری **میکروسرویس (Microservices)** است که به صورت **۱۰۰٪ جاوا** پیاده‌سازی شده است. در لایه فرانت‌اند و پنل ادمین، از فریم‌ورک مدرن **Vaadin 25** با تم Aura بهره گرفته شده است تا بدون نیاز به جاوااسکریپت و به روش کامپوننت‌محور، یک تجربه کاربری مدرن، چشم‌نواز، واکنش‌گرا و بومی زبان فارسی (RTL با تایپوگرافی وزیرمتن) فراهم گردد.
+
+اصول کلیدی رعایت‌شده در معماری ورتکس:
+- **اصل DRY (Don't Repeat Yourself)** از طریق ماژول‌های اشتراکی `core` و `stellar-ui`.
+- **Loose Coupling (عدم وابستگی شدید)** با ارتباطات مبتنی بر OpenFeign و قراردادهای مستقل.
+- **امنیت چندلایه**: توکن‌های دسترسی کوتاه‌مدت، رفرش توکن با مکانیزم چرخش (Rotation)، کپچای تک‌بارمصرف و ابطال بلادرنگ توکن‌ها در Redis Blacklist.
+
+---
+
+## 🏗 معماری سیستم و میکروسرویس‌ها
+
+```mermaid
+graph TD
+    User["🌐 مرورگر کاربر / ادمین"] -->|HTTP/HTTPS| Gateway["🚀 Gateway Server (8080)"]
+    
+    subgraph "Service Discovery & Configuration"
+        Eureka["🔍 Eureka Server (7801)"]
+        Config["⚙️ Config Server (8888)"]
+    end
+
+    Gateway -->|Forward Auth & API| OAuth["🔐 OAuth Server (7901)"]
+    Gateway -->|UI Navigation| StellarOAuth["💻 Stellar OAuth (Vaadin UI)"]
+    
+    StellarOAuth -->|OpenFeign Clients| OAuth
+    OAuth -->|JPA / Hibernate| Postgres[("🐘 PostgreSQL")]
+    OAuth -->|Token Blacklist & Cache| Redis[("⚡ Redis Cluster")]
+
+    subgraph "Shared Core Libraries"
+        Core["📦 core (DTOs & APIs)"]
+        BackendCore["🛡️ backend-core (JPA & Security)"]
+        StellarUI["🎨 stellar-ui (Vaadin Layouts & RTL)"]
+    end
+
+    StellarOAuth -.->|Inherits| StellarUI
+    StellarOAuth -.->|Uses| Core
+    OAuth -.->|Uses| BackendCore
+    OAuth -.->|Uses| Core
+    BackendCore -.->|Extends| Core
+```
+
+---
+
+## 📦 ماژول‌ها و وظایف هر سرویس
+
+| ماژول | پورت | نقش و مسئولیت | فناوری‌ها |
+| :--- | :---: | :--- | :--- |
+| **`eureka-server`** | `7801` | کشف پویای سرویس‌ها (Service Registry) و توازن بار | Netflix Eureka, Spring Cloud |
+| **`config-server`** | `8888` | سرور متمرکز پیکربندی‌ها با بک‌اند Git و رمزنگاری Jasypt | Spring Cloud Config Server |
+| **`gateway-server`** | `8080` | درگاه ورودی واحد، فیلترهای واکنشی و مسیریابی پویا | Spring Cloud Gateway, WebFlux |
+| **`oauth-server`** | `7901` | سرویس احراز هویت متمرکز، صدور JWT، رفرش توکن، RBAC و مدیریت کاربران | Spring Security, Redis OM, JPA |
+| **`core`** | - | کتابخانه مشترک قراردادهای API، مدل‌های DTO، اینترفیس‌های Feign و Enums | Java 21, MapStruct, Jackson |
+| **`backend-core`** | - | موجودیت‌های JPA، رپازیتوری‌های پایه، کش ردیس و ارزیاب دسترسی‌ها | Spring Data JPA, Redis OM |
+| **`stellar-ui`** | - | کتابخانه اشتراکی UI وادین، تم Aura، ویجت‌های فارسی، کامپوننت‌های مدرن و استایل | Vaadin 25, Lumo, Vazirmatn |
+| **`stellar-oauth`** | `7802+` | پنل ادمین و وب‌اپلیکیشن مدیریت کاربران، نقش‌ها، دسترسی‌ها و مقادیر ثابت | Spring Boot, Vaadin Flow, OpenFeign |
+
+---
+
+## 🖥 صفحات پیاده‌سازی شده پنل مدیریت
+
+مطابق با نیازمندی‌ها و الگوبرداری از صفحات پنل ادمین ساربان، بخش‌های زیر با معماری میکروسرویس و با وادین پیاده‌سازی شدند:
+
+### ۱. میز کار مدیریت (`DashboardView` — مسیر `/`)
+- کارت‌های خلاصه وضعیت و آمار کلیدی (تعداد کاربران فعال، نقش‌ها، مجوزها و مقادیر ثابت).
+- کارت‌های دسترسی سریع (Quick Actions) به بخش‌های مختلف با آیکون‌های اختصاصی و انیمیشن ترانزیشن.
+- ویجت مانیتورینگ سلامت اکوسیستم میکروسرویس‌ها و پورت‌های فعال.
+
+### ۲. مدیریت کاربران (`UsersView` — مسیر `/users`)
+- **حالت نمایش دوگانه (View Mode Toggle)**: امکان جابجایی بین حالت **جدولی (Table)** و حالت **کارتی (Grid)**.
+- **جستجوی پیشرفته**: فیلتر بر اساس نام کاربری، وضعیت حساب و نقش‌ها با مکانیزم Debounce.
+- **مدیریت کامل حساب‌ها**:
+  - مدال ایجاد کاربر جدید همراه با تعیین کلمه عبور و انتخاب چندگانه نقش‌ها.
+  - مدال ویرایش کاربر و امکان تغییر کلمه عبور به صورت اختیاری.
+  - تغییر وضعیت سریع فعال/غیرفعال با دکمه اختصاصی.
+  - حذف کاربر با دیالوگ تایید هشدارآمیز (`ConfirmDialog`) و جلوگیری از حذف حساب جاری.
+
+### ۳. مدیریت نقش‌ها (`RolesView` — مسیر `/roles`)
+- نمایش فهرست نقش‌ها با دو حالت جدولی و کارتی.
+- فیلدهای نام سیستمی انگلیسی (مانند `ROLE_ADMIN`)، عنوان فارسی مستعار، توضیحات و وضعیت فعال بودن.
+- دکمه میانبر اختصاصی جهت ورود مستقیم به ماتریس دسترسی‌های همان نقش.
+- مدال‌های استاندارد ایجاد و ویرایش نقش.
+
+### ۴. ماتریس دسترسی‌ها (`PermissionsView` — مسیر `/permissions`)
+- انتخاب پویای نقش کاربری از دراپ‌داون هوشمند.
+- فیلتر و جستجوی لحظه‌ای در بین منوهای سیستم.
+- جدول ماتریس مجوزها با چک‌باکس‌های تفکیک‌شده:
+  - **مشاهده (`READ`)**
+  - **ایجاد (`CREATE`)**
+  - **ویرایش (`UPDATE`)**
+  - **حذف (`DELETE`)**
+- دکمه‌های «انتخاب همه» و «لغو همه» جهت تسریع در پیکربندی.
+- دکمه ذخیره تغییرات و همگام‌سازی آنی با سرور احراز هویت از طریق متد `sync`.
+
+### ۵. مقادیر ثابت و کدینگ (`CodeTypesView` — مسیر `/constants`)
+- رابط کاربری زبانه‌دار (Tabs) شامل:
+  - **اقلام مقادیر ثابت (Items)**: فیلتر بر اساس گروه کد، جستجو، اولویت نمایش، عنوان فارسی، عنوان انگلیسی و وضعیت فعال/غیرفعال.
+  - **گروه‌های مقادیر ثابت (Types)**: مدیریت دسته‌بندی‌ها، شناسه کد و نوع شمارشی (`isEnum`).
+- مدال‌های اختصاصی ایجاد و ویرایش برای هر دو سطح گروه‌ها و اقلام.
+
+### ۶. مستندات و معماری سیستم (`DocsView` — مسیر `/documents`)
+- **تب معماری**: نقشه تصویری و کارت‌های تشریح تک‌تک میکروسرویس‌ها و پورت‌های ارتباطی.
+- **تب امنیت**: تشریح گام‌به‌گام چرخه حیات توکن‌ها، رمزنگاری RSA و کش ردیس.
+- **تب وب‌سرویس‌ها**: کاتالوگ اندپوینت‌های REST به تفکیک متدهای HTTP (GET, POST, PUT, DELETE).
+- **تب مخزن اسناد**: فهرست اسناد فنی، حجم فایل، پیش‌نمایش و دانلود فایل‌ها.
+
+---
+
+## 🔐 امنیت و چرخه حیات توکن‌ها
+
+برای ارتقای امنیت سامانه، مکانیزم‌های پیشرفته زیر پیاده‌سازی شدند:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as کاربر ادمین
+    participant UI as Stellar OAuth (Vaadin)
+    participant Auth as OAuth Server
+    participant Redis as Redis Cache
+
+    Admin->>UI: ورود (نام کاربری + رمز عبور + کپچا)
+    Note over UI,Auth: داده‌ها با کلید عمومی RSA رمزنگاری می‌شوند
+    UI->>Auth: POST /v1/token (Encrypted Payload)
+    Auth->>Auth: اعتبارسنجی کپچا و کلمه عبور هش‌شده
+    Auth->>UI: TokenResponse (Access Token + Refresh Token)
+    Note over UI: ذخیره ایمن در VaadinSession
+
+    loop فراخوانی سرویس‌های محافظت‌شده
+        UI->>Auth: Request + Authorization: Bearer <Access Token>
+        Auth->>UI: پاسخ مجاز (200 OK)
+    end
+
+    Note over Auth,UI: انقضای Access Token (۴۰۱ Unauthorized)
+    UI->>Auth: POST /v1/token/refresh (Refresh Token)
+    Auth->>Redis: بررسی عدم ابطال Refresh Token
+    Auth->>Redis: ابطال توکن قبلی (Single-Use Rotation)
+    Auth->>UI: TokenResponse جدید (New Access + New Refresh)
+    
+    Admin->>UI: خروج از حساب (Logout)
+    UI->>Auth: POST /v1/token/logout
+    Auth->>Redis: ثبت توکن‌ها در Blacklist تا زمان انقضا
+```
+
+### اصلاحات امنیتی انجام‌شده:
+1. **پشتیبانی از Refresh Token**: صدور جفت‌توکن دسترسی و تمدید با طول‌عمرهای استاندارد.
+2. **چرخش توکن (Token Rotation)**: یک‌بارمصرف بودن رفرش توکن برای جلوگیری از حملات Replay.
+3. **بلک‌لیست در ردیس**: ابطال فوری توکن‌ها در زمان خروج یا تغییر دسترسی کاربر.
+4. **اصلاح هش کلمات عبور**: اصلاح `DataInitializer` به نحوی که کاربر پیش‌فرض نیز با `PasswordEncoder` هش شود.
+5. **اعتبارسنجی یکپارچه کلاینت**: هندل خودکار خطای ۴۰۱ و تمدید شفاف نشست بدون قطع کار کاربر.
+
+---
+
+## 🎨 طراحی رابط کاربری و تجربه کاربری (UI/UX)
+
+- **کاملاً فارسی و راست‌چین (RTL)**: تعریف هوشمندانه جهت صفحه و فونت **وزیرمتن (Vazirmatn)** در تمام سطوح.
+- **طراحی مدرن کارت‌ها و گریدها**: بهره‌گیری از سایه‌های ملایم، ترانزیشن‌های روان و خطوط تفکیک‌کننده استاندارد Lumo.
+- **StatusBadge**: برچسب‌های رنگی چشم‌نواز برای نمایش وضعیت‌ها (سبز برای فعال، قرمز برای غیرفعال، زرد برای قفل یا هشدار).
+- **دیالوگ‌های هوشمند (`EntityModal` و `ConfirmDialog`)**: تجربه سریع، مدرن و هماهنگ با طراحی مدرن وب بدون رفرش صفحه.
+
+---
+
+## 🚀 راهنمای راه‌اندازی و اجرا
+
+### پیش‌نیازها
+- **Java 21**
+- **Docker & Docker Compose** (برای PostgreSQL و Redis)
+
+### ترتیب اجرای میکروسرویس‌ها
 
 ```bash
-. /etc/profile
-sudo update-alternatives --install "/usr/bin/java" "java" "/opt/java/jdk-17.0.10/bin/java" 1
-sudo update-alternatives --install "/usr/bin/javac" "javac" "/opt/java/jdk-17.0.10/bin/javac" 1
-sudo update-alternatives --set java /opt/java/jdk-17.0.10/bin/java
-sudo update-alternatives --config java
-java --version
-source /etc/profile.d/java.sh
-source /etc/profile.d/maven.sh
+# ۱. راه‌اندازی پایگاه داده و ردیس
+docker run --name vertex-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:latest
+docker run --name vertex-redis -p 6379:6379 -d redis:latest
+
+# ۲. بیلد و پابلیش ماژول‌های اشتراکی در ریپازیتوری لوکال
+cd /home/dev/workspace/vertex/core && ./gradlew publishToMavenLocal
+cd /home/dev/workspace/vertex/backend-core && ./gradlew publishToMavenLocal
+cd /home/dev/workspace/vertex/stellar-ui && ./gradlew publishToMavenLocal
+
+# ۳. اجرای سرورهای زیرساختی به ترتیب
+cd /home/dev/workspace/vertex/eureka-server && ./gradlew bootRun
+cd /home/dev/workspace/vertex/config-server && ./gradlew bootRun
+cd /home/dev/workspace/vertex/gateway-server && ./gradlew bootRun
+
+# ۴. اجرای سرور احراز هویت
+cd /home/dev/workspace/vertex/oauth-server && ./gradlew bootRun
+
+# ۵. اجرای پنل مدیریت وادین
+cd /home/dev/workspace/vertex/stellar-oauth && ./gradlew bootRun
 ```
 
-### Environment Variables
+---
 
-Create `/etc/profile.d/java.sh`:
+## 📚 مستندات تکمیلی و DevOps
 
-```bash
-JAVA_HOME=/opt/java/jdk-17.0.10
-PATH=$PATH:$HOME/bin:$JAVA_HOME/bin
-export JAVA_HOME
-export PATH
-```
+جهت دسترسی به راهنمای جامع دِواپس، اسکریپت‌های لینوکس، تونل معکوس SSH، دستورات داکر و بک‌آپ دیتابیس که پیش‌تر تدوین شده بودند، فایل زیر را مطالعه فرمایید:
 
-Then set permissions:
-
-```bash
-sudo chmod 755 /etc/profile.d/java.sh
-```
-
-### Maven
-
-Create `/etc/profile.d/maven.sh`:
-
-```bash
-export M2_HOME=/opt/maven
-export MAVEN_HOME=/opt/maven
-export PATH=${M2_HOME}/bin:${PATH}
-```
-
-Set permissions:
-
-```bash
-sudo chmod 755 /etc/profile.d/maven.sh
-```
-
-## 🔧 Useful Commands
-
-### File Transfer (SCP)
-
-```bash
-# Transfer backup.sql to remote server
-scp backup.sql mmad@10.10.10.1:/home/admin/Downloads
-```
-
-### SSH Tunneling
-
-```bash
-# Establish reverse SSH tunnel (remote port 8080 → local port 20)
-ssh -R 8080:localhost:20 mmad@10.10.10.1
-```
-
-## 🗄️ PostgreSQL with Docker
-
-### Volume and Network Setup
-
-```bash
-# Create volume for persistent data
-sudo docker volume create pg-data
-
-# Create network for backend-database communication
-sudo docker network create pg-net
-```
-
-### Run PostgreSQL Container
-
-```bash
-# Start PostgreSQL instance
-sudo docker run --name pg \
-  --volume pg-data:/var/lib/postgresql/data \
-  --network pg-net \
-  -e POSTGRES_PASSWORD=postgres \
-  -p 5432:5432 \
-  -d postgres:latest
-```
-
-### Database Operations
-
-```bash
-# Access PostgreSQL CLI
-sudo docker exec -it pg psql -U postgres
-
-# Restore backup into 'version' database
-cat bu.sql | sudo docker exec -i pg psql -U postgres -d version
-```
-
-### SQL Commands (run inside psql)
-
-```sql
--- Create superuser
-CREATE USER cloud WITH SUPERUSER PASSWORD 'cloud';
-```
-
-## 📡 Kafka Setup
-
-### Clone and Run
-
-```bash
-# Download Kafka stack
-git clone https://github.com/conduktor/kafka-stack-docker-compose.git
-cd kafka-stack-docker-compose
-
-# Start Kafka single-node cluster
-sudo docker-compose -f zk-single-kafka-single.yml up -d
-
-# Verify running containers (kafka1, zoo1)
-sudo docker ps | grep -E "(kafka1|zoo1)"
-
-# Access Kafka container shell
-sudo docker exec -it kafka1 /bin/bash
-```
-
-### Management Commands
-
-```bash
-# Stop Kafka cluster
-sudo docker-compose -f zk-single-kafka-single.yml down
-
-# Check Kafka version
-kafka-topics --version
-
-# Consume messages from terminal
-kafka-console-consumer --topic oauth-topic \
-  --from-beginning \
-  --bootstrap-server localhost:9092
-```
-
-## 🚀 Running Java Applications with Jasypt
-
-```bash
-# Run with encrypted configuration (Jasypt)
-java -Djasypt.encryptor.password=MASTER_KEY -jar your-application.jar
-```
-
-## 📊 Container Management
-
-```bash
-# Formatted container listing
-sudo docker ps --format \
-"ID: {{.ID}}\nImage: {{.Image}}\nPorts: {{.Ports}}\nStatus: {{.Status}}\nNames: {{.Names}}\n-----------------------"
-```
-
-## 🐳 Common Docker Images
-
-### Security Testing
-
-```bash
-# Kali Linux (penetration testing)
-sudo docker run --network pen-net -h attacker -it --name kalibox kalilinux/kali-rolling
-
-# Metasploitable2 (vulnerable VM)
-sudo docker run --network pen-net -h private -it --name metasploitable2 tleemcjr/metasploitable2
-
-# Broken Web App (bWAPP)
-sudo docker run -d -p 80:80 --name bwp hackersploit/bwapp-docke
-```
-
-### Identity & Access
-
-```bash
-# Keycloak (Identity Server)
-docker run -d --name keycloak -p 8080:8080 \
-  -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin \
-  quay.io/keycloak/keycloak:24.0.1 start-dev
-```
-
-### Version Control
-
-```bash
-# Gitea (Git Server)
-docker run -d --name gitea \
-  -e USER_UID=1000 -e USER_GID=1000 \
-  -p 3000:3000 -p 222:22 \
-  -v /home/dev/Documents/Docker/gitea_data:/data \
-  -v /etc/timezone:/etc/timezone:ro \
-  -v /etc/localtime:/etc/localtime:ro \
-  gitea/gitea:latest
-```
-
-### Data Stores
-
-```bash
-# Redis (Cache/Message Broker)
-sudo docker run -d --name redis -p 6379:6379 redis:latest --appendonly yes
-
-# Redis Stack (with GUI)
-docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 \
-  -e REDIS_ARGS="--appendonly yes" \
-  redis/redis-stack:latest
-
-# Redis CLI Operations
-docker exec -it redis redis-cli
-# List all keys: keys *
-# Get specific key: get <key_name>
-```
-
-### Artifact Repository
-
-```bash
-# Nexus (Artifact Repository)
-# Set permissions first
-sudo docker run --rm -v /home/dev/Documents/Docker/nexus_data:/nexus-data \
-  alpine sh -c "chown -R 200:200 /nexus-data"
-
-# Run Nexus
-sudo docker run -d -p 7900:8081 --name nexus \
-  --dns 8.8.8.8 --dns 4.2.2.4 \
-  --dns 178.22.122.100 --dns 185.51.200.2 \
-  -v /home/dev/Documents/Docker/nexus_data:/nexus-data \
-  sonatype/nexus3:latest
-
-# Get initial admin password
-sudo docker exec nexus cat /nexus-data/admin.password
-```
+👉 **[راهنمای جامع DevOps، لینوکس و زیرساخت (DEVOPS_AND_SYSADMIN_GUIDE.md)](./DEVOPS_AND_SYSADMIN_GUIDE.md)**

@@ -1,23 +1,28 @@
 package com.vertex.oauth.controller;
 
-
+import com.vertex.backendcore.entity.UserEntity;
 import com.vertex.backendcore.service.CaptchaGeneratorService;
 import com.vertex.backendcore.service.redis.CacheService;
 import com.vertex.core.api.oauth.TokenApi;
 import com.vertex.core.config.CommonConstant;
 import com.vertex.core.config.MessageProvider;
+import com.vertex.core.dto.request.RefreshTokenRequest;
 import com.vertex.core.dto.response.CaptchaResponse;
 import com.vertex.core.dto.response.TokenResponse;
 import com.vertex.core.exceptions.ServiceException;
+import com.vertex.core.util.ResponseMessage;
 import com.vertex.core.util.RestResponse;
 import com.vertex.oauth.config.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -33,24 +38,27 @@ import static com.vertex.backendcore.security.CryptoUtil.decryptWithPrivateRsaKe
 @RestController
 public class TokenController implements TokenApi {
 
-    private final long expirationRequestTime;
-    private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final CacheService cacheService;
     private final CaptchaGeneratorService captchaGeneratorService;
+    private final AuthenticationManager authenticationManager;
+    private final CacheService cacheService;
+    private final UserDetailsService userDetailsService;
+
+    @Value("${security.request.expiration-time}")
+    private Long expirationRequestTime;
 
     public TokenController(
-            AuthenticationManager authenticationManager,
             JwtTokenProvider jwtTokenProvider,
-            CacheService cacheService,
             CaptchaGeneratorService captchaGeneratorService,
-            @Value("${security.token.expiration-request-time}") long expirationRequestTime
+            AuthenticationManager authenticationManager,
+            CacheService cacheService,
+            UserDetailsService userDetailsService
     ) {
-        this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.expirationRequestTime = expirationRequestTime;
-        this.cacheService = cacheService;
         this.captchaGeneratorService = captchaGeneratorService;
+        this.authenticationManager = authenticationManager;
+        this.cacheService = cacheService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -65,9 +73,65 @@ public class TokenController implements TokenApi {
             );
             SecurityContextHolder.getContext().setAuthentication(authenticate);
         } catch (Exception e) {
+            log.warn("Authentication failed for user: {}", si.username());
             throw new ServiceException(MessageProvider.getMessageByKey("Unauthorized"));
         }
-        return RestResponse.ok(new TokenResponse(jwtTokenProvider.generateToken(si.username, request)));
+
+        String accessToken = jwtTokenProvider.generateToken(si.username, request);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(si.username, request);
+        log.info("Tokens successfully generated for user: {}", si.username());
+
+        return RestResponse.ok(new TokenResponse(accessToken, refreshToken, 3600L, "Bearer"));
+    }
+
+    @Override
+    public RestResponse<TokenResponse> refreshToken(RefreshTokenRequest request) {
+        if (request == null || StringUtils.isBlank(request.refreshToken())) {
+            throw new ServiceException(MessageProvider.getMessageByKey("RefreshTokenRequired"));
+        }
+
+        HttpServletRequest servletRequest =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+
+        boolean isValid = jwtTokenProvider.validateRefreshToken(request.refreshToken(), servletRequest);
+        if (!isValid) {
+            log.warn("Invalid or expired refresh token attempted");
+            throw new ServiceException(MessageProvider.getMessageByKey("InvalidOrExpiredRefreshToken"));
+        }
+
+        String username = jwtTokenProvider.getUsernameFromToken(request.refreshToken());
+        UserEntity user = (UserEntity) userDetailsService.loadUserByUsername(username);
+        if (user == null || !user.isEnabled() || !user.isAccountNonLocked()) {
+            throw new ServiceException(MessageProvider.getMessageByKey("AccountDisabledOrLocked"));
+        }
+
+        // Revoke the old refresh token to prevent replay attacks (refresh token rotation)
+        jwtTokenProvider.revokeToken(request.refreshToken());
+
+        String newAccessToken = jwtTokenProvider.generateToken(username, servletRequest);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(username, servletRequest);
+
+        log.info("Token successfully refreshed for user: {}", username);
+        return RestResponse.ok(new TokenResponse(newAccessToken, newRefreshToken, 3600L, "Bearer"));
+    }
+
+    @Override
+    public ResponseMessage logout(RefreshTokenRequest request) {
+        HttpServletRequest servletRequest =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+
+        String authHeader = servletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.isNotBlank(authHeader)) {
+            jwtTokenProvider.revokeToken(authHeader);
+        }
+
+        if (request != null && StringUtils.isNotBlank(request.refreshToken())) {
+            jwtTokenProvider.revokeToken(request.refreshToken());
+        }
+
+        SecurityContextHolder.clearContext();
+        log.info("User session logged out and tokens revoked");
+        return ResponseMessage.success();
     }
 
     @Override
@@ -94,11 +158,12 @@ public class TokenController implements TokenApi {
             throw new ServiceException(MessageProvider.getMessageByKey("CaptchaTimeout"));
         }
 
-        if (!expectedAnswer.equals(captchaAnswer)) {
+        // Challenge is single-use: immediately delete
+        cacheService.deleteCache(cacheKey);
+
+        if (!expectedAnswer.equalsIgnoreCase(captchaAnswer.trim())) {
             throw new ServiceException(MessageProvider.getMessageByKey("CaptchaNotMatch"));
         }
-
-        cacheService.deleteCache(cacheKey);
     }
 
     private SecurityInfo decrypt(String encryptedBase64) {

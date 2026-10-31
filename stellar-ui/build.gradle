@@ -33,6 +33,7 @@ configurations {
 }
 
 repositories {
+    mavenLocal()
     maven {
         name = "nexus"
         url = uri("http://localhost:7900/repository/maven-releases/")

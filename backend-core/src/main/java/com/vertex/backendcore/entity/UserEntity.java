@@ -48,7 +48,7 @@ public class UserEntity extends BasePO implements Serializable, UserDetails {
     @ManyToOne(fetch = FetchType.LAZY)
     private UserInfoEntity userInfo;
 
-    @Column(name = "user_info_id", nullable = false)
+    @Column(name = "user_info_id")
     private Long userInfoId;
 
     @ManyToMany(targetEntity = RoleEntity.class, fetch = FetchType.EAGER)
@@ -76,15 +76,15 @@ public class UserEntity extends BasePO implements Serializable, UserDetails {
     private TypeLastUpdateEnum lastUpdate;
 
     public String getFirstName() {
-        return getUserInfo().getFirstName();
+        return getUserInfo() != null ? getUserInfo().getFirstName() : null;
     }
 
     public String getLastName() {
-        return getUserInfo().getLastName();
+        return getUserInfo() != null ? getUserInfo().getLastName() : null;
     }
 
     public String getNationalCode() {
-        return getUserInfo().getNationalNo();
+        return getUserInfo() != null ? getUserInfo().getNationalNo() : null;
     }
 
     @Override

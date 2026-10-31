@@ -20,36 +20,78 @@ public final class AuthManager {
     }
 
     public static void clearToken() {
-        VaadinSession.getCurrent().setAttribute(Constant.AUTH_TOKEN, null);
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session != null) {
+            session.setAttribute(Constant.AUTH_TOKEN, null);
+            session.setAttribute(Constant.AUTH_REFRESH_TOKEN, null);
+            session.setAttribute(Constant.AUTH_USERNAME, null);
+            session.setAttribute(Constant.AUTH_MENU, null);
+        }
     }
 
     public static void saveToken(VaadinSession session, String token) {
-        session.setAttribute(Constant.AUTH_TOKEN, token);
+        if (session != null) {
+            session.setAttribute(Constant.AUTH_TOKEN, token);
+        }
+    }
+
+    public static void saveTokens(VaadinSession session, String accessToken, String refreshToken, String username) {
+        if (session != null) {
+            session.setAttribute(Constant.AUTH_TOKEN, accessToken);
+            session.setAttribute(Constant.AUTH_REFRESH_TOKEN, refreshToken);
+            session.setAttribute(Constant.AUTH_USERNAME, username);
+        }
     }
 
     public static String getToken() {
-        Object token = VaadinSession.getCurrent().getAttribute(Constant.AUTH_TOKEN);
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session == null) return null;
+        Object token = session.getAttribute(Constant.AUTH_TOKEN);
         return token != null ? token.toString() : null;
+    }
+
+    public static String getRefreshToken() {
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session == null) return null;
+        Object refreshToken = session.getAttribute(Constant.AUTH_REFRESH_TOKEN);
+        return refreshToken != null ? refreshToken.toString() : null;
+    }
+
+    public static String getUsername() {
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session == null) return "admin";
+        Object username = session.getAttribute(Constant.AUTH_USERNAME);
+        return username != null ? username.toString() : "admin";
+    }
+
+    public static boolean isAuthenticated() {
+        String token = getToken();
+        return token != null && !token.isBlank();
     }
 
     public static void redirectToLogin(UI ui) {
         clearToken();
-        ui.navigate(Routing.LOGIN);
+        if (ui != null) {
+            ui.navigate(Routing.LOGIN);
+        }
     }
 
     public static void saveMenus(VaadinSession session, List<ViewMenuDto> menus) {
-        session.setAttribute(Constant.AUTH_MENU, menus);
+        if (session != null) {
+            session.setAttribute(Constant.AUTH_MENU, menus);
+        }
     }
 
     @SuppressWarnings("unchecked")
     public static List<ViewMenuDto> getMenus() {
-        Object menus = VaadinSession.getCurrent().getAttribute(Constant.AUTH_MENU);
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session == null) return new ArrayList<>();
+        Object menus = session.getAttribute(Constant.AUTH_MENU);
 
         if (menus instanceof List<?>) {
             return (List<ViewMenuDto>) menus;
         }
 
-        log.warn("menus are not present in session or in valid format!");
         return new ArrayList<>();
     }
 }

@@ -4,6 +4,11 @@ package com.vertex.stellarui.constant;
 public interface Routing {
 
     String LOGIN = "login";
-    String DASHBOARD = "/";
+    String DASHBOARD = "";
     String MENU = "menu";
+    String USERS = "users";
+    String ROLES = "roles";
+    String PERMISSIONS = "permissions";
+    String CONSTANTS = "constants";
+    String DOCUMENTS = "documents";
 }

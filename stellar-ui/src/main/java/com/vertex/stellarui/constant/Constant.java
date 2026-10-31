@@ -14,5 +14,7 @@ public class Constant {
 
     //oauth token key in session
     public static final String AUTH_TOKEN = "authToken";
+    public static final String AUTH_REFRESH_TOKEN = "authRefreshToken";
+    public static final String AUTH_USERNAME = "authUsername";
     public static final String AUTH_MENU = "authMenu";
 }

@@ -8,16 +8,34 @@
 
 @font-face {
     font-family: 'Vazirmatn';
+    src: url('../../fonts/Vazirmatn/Vazirmatn-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Vazirmatn';
     src: url('../../fonts/Vazirmatn/Vazirmatn-Bold.woff2') format('woff2');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
 }
 
-html {
-    --lumo-font-family: 'Vazirmatn', sans-serif;
+:root {
+    --lumo-font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --lumo-primary-color: #2563eb;
+    --lumo-primary-text-color: #1d4ed8;
+    --lumo-primary-color-50pct: rgba(37, 99, 235, 0.5);
+    --lumo-primary-color-10pct: rgba(37, 99, 235, 0.1);
+    --lumo-border-radius-m: 8px;
+    --lumo-border-radius-l: 12px;
+}
 
-    font-family: var(--lumo-font-family), sans-serif;
+html {
+    direction: rtl;
+    text-align: right;
+    font-family: var(--lumo-font-family);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -25,4 +43,73 @@ html {
 body {
     margin: 0;
     padding: 0;
+    background-color: var(--lumo-contrast-5pct);
+}
+
+/* Card layout helper */
+.vertex-card {
+    background: var(--lumo-base-color);
+    border: 1px solid var(--lumo-contrast-10pct);
+    border-radius: var(--lumo-border-radius-l);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: var(--lumo-space-m);
+}
+
+.vertex-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-color: var(--lumo-contrast-20pct);
+}
+
+/* Metric / Stats Card */
+.stat-card {
+    background: var(--lumo-base-color);
+    border: 1px solid var(--lumo-contrast-10pct);
+    border-radius: var(--lumo-border-radius-l);
+    padding: var(--lumo-space-l);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--lumo-primary-color), #60a5fa);
+}
+
+/* Data grid enhancements */
+vaadin-grid {
+    border-radius: var(--lumo-border-radius-l);
+    border: 1px solid var(--lumo-contrast-10pct);
+    background: var(--lumo-base-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+vaadin-grid::part(header-cell) {
+    background-color: var(--lumo-contrast-5pct);
+    font-weight: 600;
+    color: var(--lumo-secondary-text-color);
+    font-size: var(--lumo-font-size-s);
+}
+
+/* Glassmorphic card */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }

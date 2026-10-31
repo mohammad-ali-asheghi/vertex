@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,6 +27,7 @@ public class DataInitializer {
     private final UserRoleRepository userRoleRepository;
     private final MenuRepository menuRepository;
     private final PermissionRepository permissionRepository;
+    private final PasswordEncoder passwordEncoder;
     private final String username;
     private final String password;
     private final String roleName;
@@ -37,6 +39,7 @@ public class DataInitializer {
             UserRoleRepository userRoleRepository,
             MenuRepository menuRepository,
             PermissionRepository permissionRepository,
+            PasswordEncoder passwordEncoder,
             @Value("${security.default.username}") String username,
             @Value("${security.default.password}") String password,
             @Value("${security.default.role-name}") String roleName
@@ -47,6 +50,7 @@ public class DataInitializer {
         this.userRoleRepository = userRoleRepository;
         this.menuRepository = menuRepository;
         this.permissionRepository = permissionRepository;
+        this.passwordEncoder = passwordEncoder;
         this.username = username;
         this.password = password;
         this.roleName = roleName;
@@ -55,7 +59,7 @@ public class DataInitializer {
     @Bean
     public Boolean init() {
         if (userService.existsByUsername(username)) {
-            log.info("username exists");
+            log.info("Default user {} already exists", username);
             syncMissingRolePermissions();
             return false;
         }
@@ -105,12 +109,12 @@ public class DataInitializer {
     private Long createUser() {
         UserEntity entity = new UserEntity();
         entity.setUsername(username);
-        entity.setPassword(password);
+        entity.setPassword(passwordEncoder.encode(password));
         entity.setEnabled(true);
         entity.setLoginAttemptNumber(0);
         entity.setLastUpdate(TypeLastUpdateEnum.CREATE_USER);
         userRepository.save(entity);
-        log.info("username created with id: {}", entity.getId());
+        log.info("Default admin user created with id: {}", entity.getId());
         return entity.getId();
     }
 
@@ -120,9 +124,9 @@ public class DataInitializer {
         entity.setAliasName(OauthConstant.DEFAULT_ALIS_NAME);
         entity.setApplicationId(OauthConstant.OAUTH_APPLICATION_ID);
         entity.setName(roleName);
-        entity.setDescription("description");
+        entity.setDescription("System Administrator Role");
         roleRepository.save(entity);
-        log.info("role created with id: {}", entity.getId());
+        log.info("Default admin role created with id: {}", entity.getId());
         return entity.getId();
     }
 
@@ -131,6 +135,6 @@ public class DataInitializer {
         entity.setUserId(userId);
         entity.setRoleId(roleId);
         userRoleRepository.save(entity);
-        log.info("user-role created with id: {}", entity.getId());
+        log.info("user-role association created for user {} and role {}", userId, roleId);
     }
 }

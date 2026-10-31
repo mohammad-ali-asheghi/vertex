@@ -176,7 +176,7 @@ public class LoginView extends VerticalLayout implements HasDynamicTitle {
                     passwordField.clear();
                     return;
                 }
-                AuthManager.saveToken(session, response.token());
+                AuthManager.saveTokens(session, response.token(), response.refreshToken(), usernameField.getValue());
                 createMenuSession(session);
                 Notifier.success(getTranslation("LoginViewSuccess"));
                 ui.navigate(Routing.DASHBOARD);
