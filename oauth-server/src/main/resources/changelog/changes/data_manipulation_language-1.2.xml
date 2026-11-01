@@ -9,6 +9,10 @@
     <property name="now" value="now()" dbms="postgresql"/>
 
     <changeSet id="dml-1.1-14050105-1130-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="application"/>
+            <sqlCheck expectedResult="0">SELECT count(*) FROM application WHERE id = 1</sqlCheck>
+        </preConditions>
         <insert tableName="application">
             <column name="id" value="1"/>
             <column name="name" value="oauth-service"/>
@@ -19,6 +23,10 @@
     </changeSet>
 
     <changeSet id="dml-1.1-14050105-1140-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="sec_menu"/>
+            <sqlCheck expectedResult="0">SELECT count(*) FROM sec_menu WHERE id = 1</sqlCheck>
+        </preConditions>
         <insert tableName="sec_menu">
             <column name="id" value="1"/>
             <column name="version" value="0"/>
@@ -32,6 +40,10 @@
     </changeSet>
 
     <changeSet id="dml-1.1-14050120-1700-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="sec_menu"/>
+            <sqlCheck expectedResult="0">SELECT count(*) FROM sec_menu WHERE id = 2</sqlCheck>
+        </preConditions>
         <insert tableName="sec_menu">
             <column name="id" value="2"/>
             <column name="version" value="0"/>

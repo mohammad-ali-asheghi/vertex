@@ -101,7 +101,7 @@ public class TokenController implements TokenApi {
 
         String username = jwtTokenProvider.getUsernameFromToken(request.refreshToken());
         UserEntity user = (UserEntity) userDetailsService.loadUserByUsername(username);
-        if (user == null || !user.isEnabled() || !user.isAccountNonLocked()) {
+        if (!user.isEnabled() || !user.isAccountNonLocked()) {
             throw new ServiceException(MessageProvider.getMessageByKey("AccountDisabledOrLocked"));
         }
 

@@ -9,6 +9,11 @@
     <property name="now" value="now()" dbms="postgresql"/>
 
     <changeSet id="create-global-seq" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="global_seq"/>
+            </not>
+        </preConditions>
         <createSequence
                 sequenceName="global_seq"
                 startValue="25000"
@@ -16,6 +21,11 @@
     </changeSet>
 
     <changeSet id="ddl-1.2-14050105-1115-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="application"/>
+            </not>
+        </preConditions>
         <createTable tableName="application" remarks="لیست سرویس‌ها و اپلیکیشن‌ها">
             <column name="id" type="BIGINT" remarks="شناسه اپلیکیشن">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_application_id"/>
@@ -49,6 +59,11 @@
     </changeSet>
 
     <changeSet id="ddl-1.2-14050105-1120-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sec_menu"/>
+            </not>
+        </preConditions>
         <createTable tableName="sec_menu" remarks="منوهای سیستم">
             <column name="id" type="BIGINT" remarks="شناسه منو">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_menu_id"/>
@@ -99,6 +114,11 @@
     </changeSet>
 
     <changeSet id="ddl-1.2-14050105-1130-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sec_user_info"/>
+            </not>
+        </preConditions>
         <createTable tableName="sec_user_info" remarks="اطلاعات تکمیلی کاربران">
             <column name="id" type="BIGINT" remarks="شناسه اطلاعات کاربری">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_user_info_id"/>
@@ -131,6 +151,11 @@
     </changeSet>
 
     <changeSet id="ddl-1.2-14050105-1135-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sec_user"/>
+            </not>
+        </preConditions>
         <createTable tableName="sec_user" remarks="کاربران">
             <column name="id" type="BIGINT" remarks="شناسه کاربران">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_user_id"/>
@@ -172,6 +197,11 @@
     </changeSet>
 
     <changeSet id="ddl-1.2-14050105-1210-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sec_role"/>
+            </not>
+        </preConditions>
         <createTable tableName="sec_role" remarks="نقش‌های سیستمی">
             <column name="id" type="BIGINT" remarks="شناسه نقش">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_role_id"/>
@@ -215,6 +245,11 @@
     </changeSet>
 
     <changeSet id="ddl-1.2-14050105-1220-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="permission"/>
+            </not>
+        </preConditions>
         <createTable tableName="permission" remarks="جدول سطوح دسترسی منوها">
             <column name="id" type="BIGINT" remarks="شناسه دسترسی">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_permission_id"/>
@@ -241,6 +276,11 @@
     </changeSet>
 
     <changeSet id="ddl-1.2-14050105-1230-dev" author="dev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="sec_users_roles"/>
+            </not>
+        </preConditions>
         <createTable tableName="sec_users_roles" remarks="جدول واسط کاربر و نقش">
             <column name="id" type="BIGINT" remarks="شناسه رابطه">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_sec_users_roles_id"/>
@@ -291,6 +331,21 @@
             <tableExists tableName="sec_role"/>
         </preConditions>
 
+        <sql dbms="postgresql" splitStatements="false">
+            DO $$
+            BEGIN
+                IF EXISTS (
+                    SELECT 1 FROM pg_class c
+                    JOIN pg_namespace n ON n.oid = c.relnamespace
+                    WHERE n.nspname IN ('public', current_schema())
+                      AND c.relname = 'view_permission'
+                      AND c.relkind = 'r'
+                ) THEN
+                    EXECUTE 'DROP TABLE IF EXISTS public.view_permission CASCADE';
+                END IF;
+            END $$;
+        </sql>
+
         <createView viewName="view_permission" replaceIfExists="true">
         <![CDATA[
             SELECT p.id,
@@ -311,6 +366,21 @@
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="sec_menu"/>
         </preConditions>
+
+        <sql dbms="postgresql" splitStatements="false">
+            DO $$
+            BEGIN
+                IF EXISTS (
+                    SELECT 1 FROM pg_class c
+                    JOIN pg_namespace n ON n.oid = c.relnamespace
+                    WHERE n.nspname IN ('public', current_schema())
+                      AND c.relname = 'view_sec_menu'
+                      AND c.relkind = 'r'
+                ) THEN
+                    EXECUTE 'DROP TABLE IF EXISTS public.view_sec_menu CASCADE';
+                END IF;
+            END $$;
+        </sql>
 
         <createView viewName="view_sec_menu" replaceIfExists="true">
         <![CDATA[
