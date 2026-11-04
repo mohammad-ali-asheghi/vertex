@@ -19,6 +19,10 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
 }
 
 repositories {
@@ -42,6 +46,7 @@ dependencies {
     implementation 'com.vertex:stellar-ui:' + stellarUiVersion
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    developmentOnly 'com.vaadin:vaadin-dev'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

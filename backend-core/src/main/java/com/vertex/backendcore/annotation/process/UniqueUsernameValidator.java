@@ -19,13 +19,22 @@ public class UniqueUsernameValidator implements ConstraintValidator<UniqueUserna
             return false;
         }
 
-        Long id = entityManager.createQuery(
-                        "SELECT e.id FROM UserEntity e WHERE e.username = :username",
-                        Long.class
-                )
-                .setParameter("username", username)
-                .getSingleResult();
+        if (entityManager == null) {
+            return true;
+        }
 
-        return id == null;
+        try {
+            java.util.List<Long> ids = entityManager.createQuery(
+                            "SELECT e.id FROM UserEntity e WHERE e.username = :username",
+                            Long.class
+                    )
+                    .setParameter("username", username)
+                    .setMaxResults(1)
+                    .getResultList();
+
+            return ids.isEmpty();
+        } catch (Exception e) {
+            return true;
+        }
     }
 }

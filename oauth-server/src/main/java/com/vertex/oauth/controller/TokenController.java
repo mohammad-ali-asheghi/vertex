@@ -44,7 +44,7 @@ public class TokenController implements TokenApi {
     private final CacheService cacheService;
     private final UserDetailsService userDetailsService;
 
-    @Value("${security.request.expiration-time}")
+    @Value("${security.token.expiration-request-time:${security.request.expiration-time:5000}}")
     private Long expirationRequestTime;
 
     public TokenController(
