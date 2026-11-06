@@ -168,9 +168,13 @@ public class TokenController implements TokenApi {
 
     private SecurityInfo decrypt(String encryptedBase64) {
         byte[] encryptedBytes = Base64.getDecoder().decode(encryptedBase64);
+        String privateKey = cacheService.getCacheByKey(CommonConstant.PRIVATE_KEY);
+        if (privateKey == null || privateKey.isBlank()) {
+            throw new ServiceException(MessageProvider.getMessageByKey("PrivateKeyNotFound"));
+        }
         byte[] decryptedBytes = decryptWithPrivateRsaKey(
                 encryptedBytes,
-                cacheService.getCacheByKey(CommonConstant.PRIVATE_KEY),
+                privateKey,
                 CommonConstant.INSTANCE_KEY
         );
         String decryptedData = new String(decryptedBytes, StandardCharsets.UTF_8);

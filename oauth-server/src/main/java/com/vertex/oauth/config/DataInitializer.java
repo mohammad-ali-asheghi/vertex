@@ -4,7 +4,6 @@ import com.vertex.backendcore.entity.*;
 import com.vertex.backendcore.enums.TypeLastUpdateEnum;
 import com.vertex.core.enums.PermissionEnum;
 import com.vertex.oauth.repository.*;
-import com.vertex.oauth.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 @DependsOn("liquibase")
 public class DataInitializer {
 
-    private final UserService userService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
@@ -35,7 +33,6 @@ public class DataInitializer {
     private final String roleName;
 
     public DataInitializer(
-            UserService userService,
             UserRepository userRepository,
             RoleRepository roleRepository,
             UserRoleRepository userRoleRepository,
@@ -46,7 +43,6 @@ public class DataInitializer {
             @Value("${security.default.password}") String password,
             @Value("${security.default.role-name}") String roleName
     ) {
-        this.userService = userService;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
@@ -60,16 +56,57 @@ public class DataInitializer {
 
     @Bean
     public Boolean init() {
-        if (userService.existsByUsername(username)) {
-            log.info("Default user {} already exists", username);
-            syncMissingRolePermissions();
-            return false;
+        Long roleId = getOrCreateRole();
+
+        // Ensure default admin & dev accounts exist and are functional
+        initDefaultUser("admin", "admin", roleId);
+        initDefaultUser("dev", "dev", roleId);
+
+        if (!"admin".equalsIgnoreCase(username) && !"dev".equalsIgnoreCase(username)) {
+            initDefaultUser(username, password, roleId);
         }
-        Long userId = createUser();
-        Long roleId = createRole();
-        createUserRole(userId, roleId);
+
         syncMissingRolePermissions();
         return true;
+    }
+
+    private Long getOrCreateRole() {
+        return roleRepository.findByName(roleName)
+                .map(RoleEntity::getId)
+                .orElseGet(() -> {
+                    RoleEntity entity = new RoleEntity();
+                    entity.setActive(true);
+                    entity.setAliasName(OauthConstant.DEFAULT_ALIS_NAME);
+                    entity.setApplicationId(OauthConstant.OAUTH_APPLICATION_ID);
+                    entity.setName(roleName);
+                    entity.setDescription("System Administrator Role");
+                    roleRepository.save(entity);
+                    log.info("Default admin role created with id: {}", entity.getId());
+                    return entity.getId();
+                });
+    }
+
+    private void initDefaultUser(String uName, String rawPass, Long roleId) {
+        UserEntity entity = userRepository.findByUsername(uName).orElseGet(() -> {
+            UserEntity newUser = new UserEntity();
+            newUser.setUsername(uName);
+            newUser.setLastUpdate(TypeLastUpdateEnum.CREATE_USER);
+            return newUser;
+        });
+
+        entity.setPassword(passwordEncoder.encode(rawPass));
+        entity.setEnabled(true);
+        entity.setLoginAttemptNumber(0);
+        userRepository.save(entity);
+        log.info("Default user '{}' initialized/verified with id: {}", uName, entity.getId());
+
+        if (roleId != null && !userRoleRepository.existsByUserIdAndRoleId(entity.getId(), roleId)) {
+            UserRoleEntity userRole = new UserRoleEntity();
+            userRole.setUserId(entity.getId());
+            userRole.setRoleId(roleId);
+            userRoleRepository.save(userRole);
+            log.info("user-role association created for user {} and role {}", entity.getId(), roleId);
+        }
     }
 
     private void syncMissingRolePermissions() {
@@ -106,37 +143,5 @@ public class DataInitializer {
         entity.setDevice(OauthConstant.DEFAULT_DEVICE);
         entity.setUserIp(OauthConstant.LOCAL_HOST);
         return entity;
-    }
-
-    private Long createUser() {
-        UserEntity entity = new UserEntity();
-        entity.setUsername(username);
-        entity.setPassword(passwordEncoder.encode(password));
-        entity.setEnabled(true);
-        entity.setLoginAttemptNumber(0);
-        entity.setLastUpdate(TypeLastUpdateEnum.CREATE_USER);
-        userRepository.save(entity);
-        log.info("Default admin user created with id: {}", entity.getId());
-        return entity.getId();
-    }
-
-    private Long createRole() {
-        RoleEntity entity = new RoleEntity();
-        entity.setActive(true);
-        entity.setAliasName(OauthConstant.DEFAULT_ALIS_NAME);
-        entity.setApplicationId(OauthConstant.OAUTH_APPLICATION_ID);
-        entity.setName(roleName);
-        entity.setDescription("System Administrator Role");
-        roleRepository.save(entity);
-        log.info("Default admin role created with id: {}", entity.getId());
-        return entity.getId();
-    }
-
-    private void createUserRole(Long userId, Long roleId) {
-        UserRoleEntity entity = new UserRoleEntity();
-        entity.setUserId(userId);
-        entity.setRoleId(roleId);
-        userRoleRepository.save(entity);
-        log.info("user-role association created for user {} and role {}", userId, roleId);
     }
 }

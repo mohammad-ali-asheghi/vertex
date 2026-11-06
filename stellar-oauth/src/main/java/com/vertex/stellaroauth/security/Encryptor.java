@@ -1,6 +1,7 @@
 package com.vertex.stellaroauth.security;
 
 import com.vertex.core.config.CommonConstant;
+import com.vertex.core.config.MessageProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -26,9 +27,12 @@ public class Encryptor {
     private final StringRedisTemplate redisTemplate;
 
     public String encryptData(String username, String password, String captchaId, String captchaAnswer) {
-        try {
-            String publicKeyBase64 = redisTemplate.opsForValue().get(CommonConstant.PUBLIC_KEY);
+        String publicKeyBase64 = redisTemplate.opsForValue().get(CommonConstant.PUBLIC_KEY);
+        if (publicKeyBase64 == null || publicKeyBase64.isBlank()) {
+            throw new IllegalStateException(MessageProvider.getMessageByKey("PublicKeyNotFound"));
+        }
 
+        try {
             byte[] publicBytes = Base64.getDecoder().decode(publicKeyBase64);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
             KeyFactory keyFactory = KeyFactory.getInstance(CommonConstant.RSA);

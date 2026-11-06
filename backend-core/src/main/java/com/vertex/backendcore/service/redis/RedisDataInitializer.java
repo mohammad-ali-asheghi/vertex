@@ -48,8 +48,16 @@ public class RedisDataInitializer implements CommandLineRunner {
     }
 
     private void generatedKey() {
-        if (!serviceName.equals(OAUTH_SERVICE_NAME))
+        if (!serviceName.equalsIgnoreCase(OAUTH_SERVICE_NAME) && !serviceName.equalsIgnoreCase("OAUTH-SERVER"))
             return;
+
+        Boolean hasPublicKey = redisTemplate.hasKey(CommonConstant.PUBLIC_KEY);
+        Boolean hasPrivateKey = redisTemplate.hasKey(CommonConstant.PRIVATE_KEY);
+        if (Boolean.TRUE.equals(hasPublicKey) && Boolean.TRUE.equals(hasPrivateKey)) {
+            System.out.println("ℹ️ RSA KeyPair already exists in Redis. Skipping generation.");
+            return;
+        }
+
         clearExistingKeys();
         try {
             generateAndStoreNewKeys();

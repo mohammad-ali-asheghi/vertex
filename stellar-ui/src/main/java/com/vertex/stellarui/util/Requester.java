@@ -1,7 +1,10 @@
 package com.vertex.stellarui.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.UI;
 import com.vertex.core.enums.ResponseCode;
+import com.vertex.core.exceptions.ServiceException;
 import com.vertex.core.util.PagedResponse;
 import com.vertex.core.util.ResponseMessage;
 import com.vertex.core.util.RestResponse;
@@ -23,6 +26,7 @@ public final class Requester {
     private static final String UNAUTHORIZED_MESSAGE = "نشست کاربری شما پایان یافته است. لطفاً دوباره وارد شوید.";
     private static final String FORBIDDEN_MESSAGE = "شما اجازه دسترسی به این بخش را ندارید.";
     private static final String INTERNAL_SERVER_ERROR = "خطایی در برقراری ارتباط با سرور رخ داد.";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private Requester() {
         throw new UnsupportedOperationException("Utility class");
@@ -32,6 +36,11 @@ public final class Requester {
         RestResponse<T> response = execute(supplier);
         if (response != null && response.getData() != null) {
             return response.getData();
+        }
+        if (response != null && response.getMessage() != null && !response.getMessage().isBlank()
+                && response.getCode() != ResponseCode.SUCCESS.getCode()) {
+            Optional<UI> optionalUI = Optional.ofNullable(UI.getCurrent());
+            optionalUI.ifPresent(ui -> ui.access(() -> Notifier.error(response.getMessage())));
         }
         return null;
     }
@@ -46,7 +55,14 @@ public final class Requester {
 
     public static boolean executeAndCheck(Supplier<ResponseMessage> supplier) {
         ResponseMessage response = execute(supplier);
-        return response != null && response.getCode() == ResponseCode.SUCCESS.getCode();
+        if (response != null && response.getCode() == ResponseCode.SUCCESS.getCode()) {
+            return true;
+        }
+        if (response != null && response.getMessage() != null && !response.getMessage().isBlank()) {
+            Optional<UI> optionalUI = Optional.ofNullable(UI.getCurrent());
+            optionalUI.ifPresent(ui -> ui.access(() -> Notifier.error(response.getMessage())));
+        }
+        return false;
     }
 
     public static <T> T execute(Supplier<T> supplier) {
@@ -70,9 +86,43 @@ public final class Requester {
         } else if (isForbidden(ex)) {
             optionalUI.ifPresent(ui -> ui.access(() -> Notifier.error(FORBIDDEN_MESSAGE)));
         } else {
-            optionalUI.ifPresent(ui -> ui.access(() -> Notifier.error(INTERNAL_SERVER_ERROR)));
+            String errorMsg = extractErrorMessage(ex);
+            optionalUI.ifPresent(ui -> ui.access(() -> Notifier.error(errorMsg != null && !errorMsg.isBlank() ? errorMsg : INTERNAL_SERVER_ERROR)));
         }
     }
+
+    public static String extractErrorMessage(Throwable ex) {
+        if (ex == null) {
+            return null;
+        }
+        Throwable root = ex;
+        while (root.getCause() != null && root.getCause() != root) {
+            if (root instanceof ServiceException se && se.getMessage() != null && !se.getMessage().isBlank()) {
+                return se.getMessage();
+            }
+            root = root.getCause();
+        }
+        if (root instanceof ServiceException se && se.getMessage() != null && !se.getMessage().isBlank()) {
+            return se.getMessage();
+        }
+        if (root instanceof FeignException feignEx) {
+            String content = feignEx.contentUTF8();
+            if (content != null && !content.isBlank()) {
+                try {
+                    JsonNode node = OBJECT_MAPPER.readTree(content);
+                    if (node.hasNonNull("message") && !node.get("message").asText().isBlank()) {
+                        return node.get("message").asText();
+                    }
+                    if (node.hasNonNull("error") && !node.get("error").asText().isBlank()) {
+                        return node.get("error").asText();
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        return root.getMessage();
+    }
+
 
     public static boolean isUnauthorized(Throwable ex) {
         switch (ex) {

@@ -22,7 +22,10 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vertex.core.dto.MenuModel;
 import com.vertex.core.dto.response.CaptchaResponse;
 import com.vertex.core.dto.view.ViewMenuDto;
+import com.vertex.core.dto.response.TokenResponse;
+import com.vertex.core.enums.ResponseCode;
 import com.vertex.core.util.PagedResponse;
+import com.vertex.core.util.RestResponse;
 import com.vertex.stellaroauth.security.Encryptor;
 import com.vertex.stellaroauth.service.MenuClient;
 import com.vertex.stellaroauth.service.TokenClient;
@@ -31,14 +34,17 @@ import com.vertex.stellarui.constant.Constant;
 import com.vertex.stellarui.constant.Routing;
 import com.vertex.stellarui.util.Notifier;
 import com.vertex.stellarui.util.Requester;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Route(Routing.LOGIN)
 @CssImport("./styles/login-view.css")
 public class LoginView extends VerticalLayout implements HasDynamicTitle {
+
 
     private final TokenClient tokenClient;
     private final MenuClient menuClient;
@@ -160,14 +166,13 @@ public class LoginView extends VerticalLayout implements HasDynamicTitle {
                     currentCaptchaId,
                     captchaField.getValue()
             );
-            return Requester.executeAndUnwrap(() -> tokenClient.getToken(encryptedData));
+            return tokenClient.getToken(encryptedData);
         }).whenComplete((response, throwable) -> ui.access(() -> {
             try {
                 loading.close();
 
                 if (throwable != null) {
-                    Throwable root = throwable.getCause() != null ? throwable.getCause() : throwable;
-                    String backendErrorMessage = root.getMessage();
+                    String backendErrorMessage = Requester.extractErrorMessage(throwable);
                     if (backendErrorMessage == null || backendErrorMessage.trim().isEmpty()) {
                         backendErrorMessage = getTranslation("InternalServerError");
                     }
@@ -176,15 +181,33 @@ public class LoginView extends VerticalLayout implements HasDynamicTitle {
                     passwordField.clear();
                     return;
                 }
-                AuthManager.saveTokens(session, response.token(), response.refreshToken(), usernameField.getValue());
+
+                if (response == null || response.getData() == null || response.getCode() != ResponseCode.SUCCESS.getCode()) {
+                    String backendErrorMessage = (response != null && response.getMessage() != null && !response.getMessage().trim().isEmpty())
+                            ? response.getMessage()
+                            : getTranslation("InternalServerError");
+                    Notifier.error(backendErrorMessage);
+                    refreshCaptcha();
+                    passwordField.clear();
+                    return;
+                }
+
+                TokenResponse tokenResponse = response.getData();
+                AuthManager.saveTokens(session, tokenResponse.token(), tokenResponse.refreshToken(), usernameField.getValue());
                 createMenuSession(session);
                 Notifier.success(getTranslation("LoginViewSuccess"));
                 ui.navigate(Routing.DASHBOARD);
+            } catch (Exception ex) {
+                log.error("Error during login handling", ex);
+                Notifier.error(getTranslation("InternalServerError"));
+                refreshCaptcha();
+                passwordField.clear();
             } finally {
                 setFormEnabled(true);
             }
         }));
     }
+
 
     private void setFormEnabled(boolean enabled) {
         usernameField.setEnabled(enabled);

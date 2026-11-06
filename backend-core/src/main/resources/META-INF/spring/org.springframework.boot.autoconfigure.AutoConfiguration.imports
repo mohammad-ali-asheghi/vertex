@@ -1,3 +1,4 @@
 com.vertex.backendcore.config.RedisCacheAutoConfiguration
 com.vertex.backendcore.config.MethodSecurityAutoConfiguration
 com.vertex.backendcore.service.CaptchaGeneratorService
+com.vertex.backendcore.config.GlobalExceptionHandler

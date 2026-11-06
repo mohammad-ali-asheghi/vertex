@@ -12,4 +12,6 @@ public interface RoleRepository extends AbstractDAO<RoleEntity> {
     List<RoleEntity> findAllByOrderByNameAsc();
 
     List<RoleEntity> findAllByActiveTrueOrderByNameAsc();
+
+    java.util.Optional<RoleEntity> findByName(String name);
 }
