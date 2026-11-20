@@ -10,7 +10,7 @@ description = 'gateway-server'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -20,7 +20,7 @@ repositories {
 }
 
 ext {
-    set('SPRING_CLOUD_VERSION', "2025.1.0")
+    set('SPRING_CLOUD_VERSION', "2026.0.0")
     set('JASYPT_VERSION', "3.0.5")
 }
 
@@ -29,6 +29,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-gateway-server-webflux'
+    implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

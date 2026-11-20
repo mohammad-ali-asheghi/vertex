@@ -39,9 +39,9 @@ public class DataInitializer {
             MenuRepository menuRepository,
             PermissionRepository permissionRepository,
             PasswordEncoder passwordEncoder,
-            @Value("${security.default.username}") String username,
-            @Value("${security.default.password}") String password,
-            @Value("${security.default.role-name}") String roleName
+            @Value("${security.default.username:admin}") String username,
+            @Value("${security.default.password:admin}") String password,
+            @Value("${security.default.role-name:ROLE_ADMIN}") String roleName
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;

@@ -46,20 +46,18 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
 
     private void addHeaderContent() {
         DrawerToggle toggle = new DrawerToggle();
-        toggle.setAriaLabel("Menu toggle");
-        toggle.getStyle().set("color", "white");
+        toggle.setAriaLabel("منو");
 
         Icon logoIcon = VaadinIcon.GRID_BIG.create();
-        logoIcon.setSize("24px");
-        logoIcon.getStyle().set("color", "white");
+        logoIcon.setSize("22px");
+        logoIcon.setColor("var(--lumo-primary-color)");
 
         H1 viewTitle = new H1("سامانه مدیریت یکپارچه ورتکس");
         viewTitle.addClassNames(
                 LumoUtility.FontSize.MEDIUM,
                 LumoUtility.Margin.NONE,
-                LumoUtility.FontWeight.BOLD
+                LumoUtility.FontWeight.SEMIBOLD
         );
-        viewTitle.getStyle().set("color", "white").set("letter-spacing", "0.5px");
 
         HorizontalLayout logoArea = new HorizontalLayout(logoIcon, viewTitle);
         logoArea.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -70,12 +68,11 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         avatar.setColorIndex(2);
 
         Span userInfo = new Span(username);
-        userInfo.getStyle().set("color", "white").set("font-weight", "600");
+        userInfo.addClassNames(LumoUtility.FontWeight.MEDIUM, LumoUtility.FontSize.SMALL);
 
         Button logoutBtn = new Button(VaadinIcon.SIGN_OUT.create());
         logoutBtn.setTooltipText("خروج از حساب کاربری");
-        logoutBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-        logoutBtn.getStyle().set("color", "white").set("opacity", "0.85");
+        logoutBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
         logoutBtn.addClickListener(e -> {
             ConfirmDialog.show("خروج از سامانه", "آیا می‌خواهید از حساب کاربری خود خارج شوید؟", () -> {
                 UI ui = UI.getCurrent();
@@ -86,12 +83,13 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         HorizontalLayout userArea = new HorizontalLayout(avatar, userInfo, logoutBtn);
         userArea.setAlignItems(FlexComponent.Alignment.CENTER);
         userArea.setSpacing(true);
-        userArea.getStyle()
-                .set("background", "rgba(255,255,255,0.18)")
-                .set("padding", "4px 12px 4px 6px")
-                .set("border-radius", "24px")
-                .set("backdrop-filter", "blur(10px)")
-                .set("margin-left", "auto");
+        userArea.addClassNames(
+                LumoUtility.Padding.Vertical.XSMALL,
+                LumoUtility.Padding.Horizontal.SMALL,
+                LumoUtility.BorderRadius.FULL,
+                LumoUtility.Background.CONTRAST_5
+        );
+        userArea.getStyle().set("margin-left", "auto");
 
         Header header = new Header(toggle, logoArea, userArea);
         header.setWidthFull();
@@ -99,12 +97,11 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
                 LumoUtility.Padding.Vertical.NONE,
                 LumoUtility.Padding.Horizontal.MEDIUM,
                 LumoUtility.Display.FLEX,
-                LumoUtility.AlignItems.CENTER
+                LumoUtility.AlignItems.CENTER,
+                LumoUtility.Background.BASE,
+                LumoUtility.Border.BOTTOM,
+                LumoUtility.BorderColor.CONTRAST_10
         );
-
-        header.getStyle()
-                .set("background", "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)")
-                .set("box-shadow", "0 2px 8px rgba(0,0,0,0.12)");
 
         addToNavbar(true, header);
     }

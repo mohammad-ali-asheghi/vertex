@@ -1,19 +1,18 @@
 package com.vertex.stellarui;
 
-import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.server.AppShellSettings;
 import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.theme.aura.Aura;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
 
 /**
- * Use the @PWA annotation make the application installable on phones, tablets
- * and some desktop browsers.
+ * Vaadin AppShell configuration utilizing standard Lumo theme.
  */
 @Push
-@PWA(name = "Vertex Base for Vaadin", shortName = "Vertex Base")
-@StyleSheet(Aura.STYLESHEET)
+@PWA(name = "Vertex Management Platform", shortName = "Vertex")
+@Theme(themeClass = Lumo.class)
 public class AppShell implements AppShellConfigurator {
 
     @Override

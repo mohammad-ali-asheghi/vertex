@@ -1,222 +1,259 @@
-# 🌌 Vertex Platform — اکوسیستم جامع میکروسرویس و پنل مدیریت وادین
+# 🌌 پلتفرم جامع میکروسرویس و پنل مدیریت Vertex
 
-[![Java](https://img.shields.io/badge/Java-21-orange.svg?logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen.svg?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2025.1.0-blue.svg?logo=spring&logoColor=white)](https://spring.io/projects/spring-cloud)
-[![Vaadin](https://img.shields.io/badge/Vaadin-25.1.3-blueviolet.svg?logo=vaadin&logoColor=white)](https://vaadin.com/)
-[![Architecture](https://img.shields.io/badge/Architecture-Microservices%20%26%20MFE-success.svg)](#معماری-سیستم)
-[![Security](https://img.shields.io/badge/Security-OAuth2%20%7C%20JWT%20%7C%20RBAC-red.svg)](#امنیت-و-چرخه-حیات-توکن)
+[![Java 25](https://img.shields.io/badge/Java-25-orange.svg?logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot 4.1.0](https://img.shields.io/badge/Spring%20Boot-4.1.0-brightgreen.svg?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Cloud 2026.0.0](https://img.shields.io/badge/Spring%20Cloud-2026.0.0-blue.svg?logo=spring&logoColor=white)](https://spring.io/projects/spring-cloud)
+[![Spring Modulith](https://img.shields.io/badge/Spring%20Modulith-2.1.3-purple.svg)](https://spring.io/projects/spring-modulith)
+[![Vaadin 25.1.3](https://img.shields.io/badge/Vaadin%20Flow-25.1.3-blueviolet.svg?logo=vaadin&logoColor=white)](https://vaadin.com/)
+[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Ready-blue.svg?logo=docker&logoColor=white)](#-راهاندازی-سریع-با-docker-compose)
+[![Status](https://img.shields.io/badge/Status-Fully%20Operational-brightgreen.svg)](#)
 
 ---
 
-## 📖 فهرست مطالب
+## 📑 فهرست مطالب
 
-1. [نمای کلی پروژه](#-نمای-کلی-پروژه)
+1. [نمای کلی و دستاوردهای بازطراحی](#-نمای-کلی-و-دستاوردهای-بازطراحی)
 2. [معماری سیستم و میکروسرویس‌ها](#-معماری-سیستم-و-میکروسرویسها)
-3. [ماژول‌ها و وظایف هر سرویس](#-ماژولها-و-وظایف-هر-سرویس)
-4. [صفحات پیاده‌سازی شده پنل مدیریت](#-صفحات-پیادهسازی-شده-پنل-مدیریت)
-5. [امنیت و چرخه حیات توکن‌ها](#-امنیت-و-چرخه-حیات-توکنها)
-6. [طراحی رابط کاربری و تجربه کاربری (UI/UX)](#-طراحی-رابط-کاربری-و-تجربه-کاربری-uiux)
-7. [راهنمای راه‌اندازی و اجرا](#-راهنمای-راهاندازی-و-اجرا)
-8. [مستندات تکمیلی و DevOps](#-مستندات-تکمیلی-و-devops)
+3. [ماژول‌بندی پیشرفته با Spring Modulith](#-ماژولبندی-پیشرفته-با-spring-modulith)
+4. [طراحی رابط کاربری مدرن (Vaadin Lumo & Vazirmatn)](#-طراحی-رابط-کاربری-مدرن-vaadin-lumo--vazirmatn)
+5. [امنیت، رمزنگاری و احراز هویت](#-امنیت-رمزنگاری-و-احراز-هویت)
+6. [میکروسرویس‌ها، پورت‌ها و اندپوینت‌ها](#-میکروسرویسها-پورتها-و-اندپوینتها)
+7. [گلوگاه‌ها و باگ‌های رفع‌شده](#-گلوگاهها-و-باگهای-رفعشده)
+8. [راهنمای راه‌اندازی سریع با Docker Compose](#-راهاندازی-سریع-با-docker-compose)
+9. [تست و راستی‌آزمایی سرویس‌ها](#-تست-و-راستیآزمایی-سرویسها)
+10. [اطلاعات تکمیلی و راهنمای دوآپس](#-اطلاعات-تکمیلی-و-راهنمای-دوآپس)
 
 ---
 
-## 🌟 نمای کلی پروژه
+## 🌟 نمای کلی و دستاوردهای بازطراحی
 
-پروژه **Vertex** یک پلتفرم جامع و توزیع‌شده با معماری **میکروسرویس (Microservices)** است که به صورت **۱۰۰٪ جاوا** پیاده‌سازی شده است. در لایه فرانت‌اند و پنل ادمین، از فریم‌ورک مدرن **Vaadin 25** با تم Aura بهره گرفته شده است تا بدون نیاز به جاوااسکریپت و به روش کامپوننت‌محور، یک تجربه کاربری مدرن، چشم‌نواز، واکنش‌گرا و بومی زبان فارسی (RTL با تایپوگرافی وزیرمتن) فراهم گردد.
+پروژه **Vertex** یک اکوسیستم سازمانی بر پایه میکروسرویس‌ها و پنل مدیریت تمام‌جاوا (Full-Stack Java) است. در این معماری، هیچ‌گونه نیازی به فریم‌ورک‌های جداگانه فرانت‌اند (مانند React یا Angular) نبوده و تمامی صفحات، فرم‌ها، اعتبارسنجی‌ها، منطق UI و تعاملات به صورت مستقیم و با بالاترین سطح امنیت توسط توسعه‌دهندگان بک‌اند با **Java 25** و **Vaadin Flow 25.1.3** مدیریت و رندر می‌شوند.
 
-اصول کلیدی رعایت‌شده در معماری ورتکس:
-- **اصل DRY (Don't Repeat Yourself)** از طریق ماژول‌های اشتراکی `core` و `stellar-ui`.
-- **Loose Coupling (عدم وابستگی شدید)** با ارتباطات مبتنی بر OpenFeign و قراردادهای مستقل.
-- **امنیت چندلایه**: توکن‌های دسترسی کوتاه‌مدت، رفرش توکن با مکانیزم چرخش (Rotation)، کپچای تک‌بارمصرف و ابطال بلادرنگ توکن‌ها در Redis Blacklist.
+### دستاوردهای کلیدی بازطراحی:
+- **ارتقای کامل به Java 25 و Spring Boot 4.1.0**: استفاده از جدیدترین ویژگی‌های جاوا ۲۵ و پشتیبانی از پایداری Spring Boot 4.x.
+- **ماژولار کردن معماری با Spring Modulith**: سازمان‌دهی دامنه‌ها و سرویس‌ها با معماری ماژولار و تست‌های خودکار اعتبارسنجی مرزهای ماژول‌ها.
+- **بازنویسی کامل رابط کاربری**: حذف تمامی استایل‌های شخصی و زمخت، پیاده‌سازی تم استاندارد و فوق‌العاده مدرن **Vaadin Lumo** به همراه تایپوگرافی استاندارد فارسی با قلم **وزیرمتن (Vazirmatn)** و چیدمان راست‌به‌چپ (RTL).
+- **داکرایز کردن ۱۰۰٪ پروژه و داکر کامپوز**: ساخت Dockerfileهای بهینه برای کلیه سرویس‌ها و راه‌اندازی کل اکوسیستم (پایگاه داده، کش، دیسکاوری، کانفیگ، احراز هویت، درگاه و رابط کاربری) با یک دستور.
+- **رفع کامل گلوگاه‌ها و خطاهای لاگین**: رمزگشایی متغیرهای محرمانه Jasypt، تنظیم کلیدهای RSA، رفع تداخل پورت‌ها و برقراری ارتباط بدون نقص بین میکروسرویس‌ها.
 
 ---
 
 ## 🏗 معماری سیستم و میکروسرویس‌ها
 
+معماری کل پروژه بر بستر الگوهای استاندارد Spring Cloud و Reactive Gateway بنا شده است:
+
 ```mermaid
-graph TD
-    User["🌐 مرورگر کاربر / ادمین"] -->|HTTP/HTTPS| Gateway["🚀 Gateway Server (8080)"]
+flowchart TD
+    Client["👤 کاربر / مرورگر"]
     
-    subgraph "Service Discovery & Configuration"
-        Eureka["🔍 Eureka Server (7801)"]
-        Config["⚙️ Config Server (8888)"]
+    subgraph Gateway_Layer["درگاه ورود سیستم"]
+        Gateway["🌐 API Gateway Server (Port 8085:8080)"]
     end
-
-    Gateway -->|Forward Auth & API| OAuth["🔐 OAuth Server (7901)"]
-    Gateway -->|UI Navigation| StellarOAuth["💻 Stellar OAuth (Vaadin UI)"]
     
-    StellarOAuth -->|OpenFeign Clients| OAuth
-    OAuth -->|JPA / Hibernate| Postgres[("🐘 PostgreSQL")]
-    OAuth -->|Token Blacklist & Cache| Redis[("⚡ Redis Cluster")]
-
-    subgraph "Shared Core Libraries"
-        Core["📦 core (DTOs & APIs)"]
-        BackendCore["🛡️ backend-core (JPA & Security)"]
-        StellarUI["🎨 stellar-ui (Vaadin Layouts & RTL)"]
+    subgraph Discovery_Config["زیرساخت نظارت و پیکربندی"]
+        Eureka["🔍 Eureka Discovery (Port 7801)"]
+        Config["⚙️ Config Server (Port 8888)"]
     end
-
-    StellarOAuth -.->|Inherits| StellarUI
-    StellarOAuth -.->|Uses| Core
-    OAuth -.->|Uses| BackendCore
-    OAuth -.->|Uses| Core
-    BackendCore -.->|Extends| Core
+    
+    subgraph Business_Services["سرویس‌های تجاری و رابط کاربری"]
+        OAuth["🔐 OAuth Server (Port 7901)"]
+        StellarUI["🖥️ Vaadin Flow Admin UI (Port 7802)"]
+    end
+    
+    subgraph Storage_Layer["لایه ذخیره‌سازی و کش"]
+        Postgres[("🐘 PostgreSQL 17 (Port 5434:5432)")]
+        Redis[("⚡ Redis Stack (Port 6379)")]
+    end
+    
+    Client -->|پورت 8085 یا 7802| Gateway
+    Gateway -->|مسیرهای عمومی و UI| StellarUI
+    Gateway -->|مسیرهای احراز هویت /oauth/**| OAuth
+    
+    OAuth -->|ثبت نام و دیسکاوری| Eureka
+    StellarUI -->|ثبت نام و دیسکاوری| Eureka
+    Gateway -->|ثبت نام و دیسکاوری| Eureka
+    
+    OAuth -->|دریافت تنظیمات| Config
+    StellarUI -->|دریافت تنظیمات| Config
+    Gateway -->|دریافت تنظیمات| Config
+    
+    OAuth -->|ذخیره داده‌های کاربران و دسترسی‌ها| Postgres
+    OAuth -->|کلیدهای RSA، کپچا، توکن‌ها و اسناد JSON| Redis
+    StellarUI -->|کش نشست و کلیدهای عمومی| Redis
+    StellarUI -.->|Feign Client: احراز هویت و توکن| OAuth
 ```
 
 ---
 
-## 📦 ماژول‌ها و وظایف هر سرویس
+## 📦 ماژول‌بندی پیشرفته با Spring Modulith
 
-| ماژول | پورت | نقش و مسئولیت | فناوری‌ها |
-| :--- | :---: | :--- | :--- |
-| **`eureka-server`** | `7801` | کشف پویای سرویس‌ها (Service Registry) و توازن بار | Netflix Eureka, Spring Cloud |
-| **`config-server`** | `8888` | سرور متمرکز پیکربندی‌ها با بک‌اند Git و رمزنگاری Jasypt | Spring Cloud Config Server |
-| **`gateway-server`** | `8080` | درگاه ورودی واحد، فیلترهای واکنشی و مسیریابی پویا | Spring Cloud Gateway, WebFlux |
-| **`oauth-server`** | `7901` | سرویس احراز هویت متمرکز، صدور JWT، رفرش توکن، RBAC و مدیریت کاربران | Spring Security, Redis OM, JPA |
-| **`core`** | - | کتابخانه مشترک قراردادهای API، مدل‌های DTO، اینترفیس‌های Feign و Enums | Java 21, MapStruct, Jackson |
-| **`backend-core`** | - | موجودیت‌های JPA، رپازیتوری‌های پایه، کش ردیس و ارزیاب دسترسی‌ها | Spring Data JPA, Redis OM |
-| **`stellar-ui`** | - | کتابخانه اشتراکی UI وادین، تم Aura، ویجت‌های فارسی، کامپوننت‌های مدرن و استایل | Vaadin 25, Lumo, Vazirmatn |
-| **`stellar-oauth`** | `7802+` | پنل ادمین و وب‌اپلیکیشن مدیریت کاربران، نقش‌ها، دسترسی‌ها و مقادیر ثابت | Spring Boot, Vaadin Flow, OpenFeign |
+جهت جلوگیری از وابستگی‌های درهم‌تنیده («اسپاگتی کد») و تضمین اصول معماری تمیز و طراحی دامنه-محور (DDD)، از فریم‌ورک **Spring Modulith** استفاده شده است:
 
----
-
-## 🖥 صفحات پیاده‌سازی شده پنل مدیریت
-
-مطابق با نیازمندی‌ها و الگوبرداری از صفحات پنل ادمین ساربان، بخش‌های زیر با معماری میکروسرویس و با وادین پیاده‌سازی شدند:
-
-### ۱. میز کار مدیریت (`DashboardView` — مسیر `/`)
-- کارت‌های خلاصه وضعیت و آمار کلیدی (تعداد کاربران فعال، نقش‌ها، مجوزها و مقادیر ثابت).
-- کارت‌های دسترسی سریع (Quick Actions) به بخش‌های مختلف با آیکون‌های اختصاصی و انیمیشن ترانزیشن.
-- ویجت مانیتورینگ سلامت اکوسیستم میکروسرویس‌ها و پورت‌های فعال.
-
-### ۲. مدیریت کاربران (`UsersView` — مسیر `/users`)
-- **حالت نمایش دوگانه (View Mode Toggle)**: امکان جابجایی بین حالت **جدولی (Table)** و حالت **کارتی (Grid)**.
-- **جستجوی پیشرفته**: فیلتر بر اساس نام کاربری، وضعیت حساب و نقش‌ها با مکانیزم Debounce.
-- **مدیریت کامل حساب‌ها**:
-  - مدال ایجاد کاربر جدید همراه با تعیین کلمه عبور و انتخاب چندگانه نقش‌ها.
-  - مدال ویرایش کاربر و امکان تغییر کلمه عبور به صورت اختیاری.
-  - تغییر وضعیت سریع فعال/غیرفعال با دکمه اختصاصی.
-  - حذف کاربر با دیالوگ تایید هشدارآمیز (`ConfirmDialog`) و جلوگیری از حذف حساب جاری.
-
-### ۳. مدیریت نقش‌ها (`RolesView` — مسیر `/roles`)
-- نمایش فهرست نقش‌ها با دو حالت جدولی و کارتی.
-- فیلدهای نام سیستمی انگلیسی (مانند `ROLE_ADMIN`)، عنوان فارسی مستعار، توضیحات و وضعیت فعال بودن.
-- دکمه میانبر اختصاصی جهت ورود مستقیم به ماتریس دسترسی‌های همان نقش.
-- مدال‌های استاندارد ایجاد و ویرایش نقش.
-
-### ۴. ماتریس دسترسی‌ها (`PermissionsView` — مسیر `/permissions`)
-- انتخاب پویای نقش کاربری از دراپ‌داون هوشمند.
-- فیلتر و جستجوی لحظه‌ای در بین منوهای سیستم.
-- جدول ماتریس مجوزها با چک‌باکس‌های تفکیک‌شده:
-  - **مشاهده (`READ`)**
-  - **ایجاد (`CREATE`)**
-  - **ویرایش (`UPDATE`)**
-  - **حذف (`DELETE`)**
-- دکمه‌های «انتخاب همه» و «لغو همه» جهت تسریع در پیکربندی.
-- دکمه ذخیره تغییرات و همگام‌سازی آنی با سرور احراز هویت از طریق متد `sync`.
-
-### ۵. مقادیر ثابت و کدینگ (`CodeTypesView` — مسیر `/constants`)
-- رابط کاربری زبانه‌دار (Tabs) شامل:
-  - **اقلام مقادیر ثابت (Items)**: فیلتر بر اساس گروه کد، جستجو، اولویت نمایش، عنوان فارسی، عنوان انگلیسی و وضعیت فعال/غیرفعال.
-  - **گروه‌های مقادیر ثابت (Types)**: مدیریت دسته‌بندی‌ها، شناسه کد و نوع شمارشی (`isEnum`).
-- مدال‌های اختصاصی ایجاد و ویرایش برای هر دو سطح گروه‌ها و اقلام.
-
-### ۶. مستندات و معماری سیستم (`DocsView` — مسیر `/documents`)
-- **تب معماری**: نقشه تصویری و کارت‌های تشریح تک‌تک میکروسرویس‌ها و پورت‌های ارتباطی.
-- **تب امنیت**: تشریح گام‌به‌گام چرخه حیات توکن‌ها، رمزنگاری RSA و کش ردیس.
-- **تب وب‌سرویس‌ها**: کاتالوگ اندپوینت‌های REST به تفکیک متدهای HTTP (GET, POST, PUT, DELETE).
-- **تب مخزن اسناد**: فهرست اسناد فنی، حجم فایل، پیش‌نمایش و دانلود فایل‌ها.
-
----
-
-## 🔐 امنیت و چرخه حیات توکن‌ها
-
-برای ارتقای امنیت سامانه، مکانیزم‌های پیشرفته زیر پیاده‌سازی شدند:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Admin as کاربر ادمین
-    participant UI as Stellar OAuth (Vaadin)
-    participant Auth as OAuth Server
-    participant Redis as Redis Cache
-
-    Admin->>UI: ورود (نام کاربری + رمز عبور + کپچا)
-    Note over UI,Auth: داده‌ها با کلید عمومی RSA رمزنگاری می‌شوند
-    UI->>Auth: POST /v1/token (Encrypted Payload)
-    Auth->>Auth: اعتبارسنجی کپچا و کلمه عبور هش‌شده
-    Auth->>UI: TokenResponse (Access Token + Refresh Token)
-    Note over UI: ذخیره ایمن در VaadinSession
-
-    loop فراخوانی سرویس‌های محافظت‌شده
-        UI->>Auth: Request + Authorization: Bearer <Access Token>
-        Auth->>UI: پاسخ مجاز (200 OK)
-    end
-
-    Note over Auth,UI: انقضای Access Token (۴۰۱ Unauthorized)
-    UI->>Auth: POST /v1/token/refresh (Refresh Token)
-    Auth->>Redis: بررسی عدم ابطال Refresh Token
-    Auth->>Redis: ابطال توکن قبلی (Single-Use Rotation)
-    Auth->>UI: TokenResponse جدید (New Access + New Refresh)
-    
-    Admin->>UI: خروج از حساب (Logout)
-    UI->>Auth: POST /v1/token/logout
-    Auth->>Redis: ثبت توکن‌ها در Blacklist تا زمان انقضا
+- **تفکیک دامنه‌ها (Bounded Contexts)**: ماژول‌های سیستم به بسته‌های مستقل تفکیک شده‌اند.
+- **پکیج‌بندی تمیز**: سرویس‌های احراز هویت، مدیریت توکن، کاربران، مدیریت کپچا و کدهای پایه هر یک در بسته‌های مستقل قرار گرفته‌اند.
+- **تست اعتبارسنجی خودکار ساختار**: تست ماژولیت در `OauthServerApplicationTests` وظیفه بررسی چرخه وابستگی‌ها (Cyclic Dependencies) و نقض مرز ماژول‌ها را در زمان بیلد به عهده دارد:
+```java
+ApplicationModules modules = ApplicationModules.of(OauthServerApplication.class);
+modules.verify();
 ```
 
-### اصلاحات امنیتی انجام‌شده:
-1. **پشتیبانی از Refresh Token**: صدور جفت‌توکن دسترسی و تمدید با طول‌عمرهای استاندارد.
-2. **چرخش توکن (Token Rotation)**: یک‌بارمصرف بودن رفرش توکن برای جلوگیری از حملات Replay.
-3. **بلک‌لیست در ردیس**: ابطال فوری توکن‌ها در زمان خروج یا تغییر دسترسی کاربر.
-4. **اصلاح هش کلمات عبور**: اصلاح `DataInitializer` به نحوی که کاربر پیش‌فرض نیز با `PasswordEncoder` هش شود.
-5. **اعتبارسنجی یکپارچه کلاینت**: هندل خودکار خطای ۴۰۱ و تمدید شفاف نشست بدون قطع کار کاربر.
+---
+
+## 🎨 طراحی رابط کاربری مدرن (Vaadin Lumo & Vazirmatn)
+
+یکی از دغدغه‌های اصلی پروژه، ظاهر زمخت، فونت‌های نامناسب و کدهای CSS شخصی بود که باعث ناهماهنگی و خطای لود تصاویر شده بود. در بازطراحی جدید:
+
+1. **تم رسمی Lumo وادین**: تمامی استایل‌های سفارشی ناکارآمد و فایل‌های استایل متفرقه حذف شده و از تم رسمی و مدرن و واکنش‌گرای `@Theme(themeClass = Lumo.class)` استفاده شد.
+2. **فونت یکپارچه وزیرمتن (Vazirmatn)**: فونت سیستم با استاندارد وب فارسی به صورت اختصاصی با قلم وزیرمتن تنظیم شد تا تجربه کاربری بسیار روان و حرفه‌ای در زبان فارسی فراهم کند.
+3. **پشتیبانی بومی از راست‌به‌چپ (RTL)**: تمام فرم‌ها، جداول، پیام‌های Notifier، کارت‌های ورودی و ویوها با استاندارد جهت متن راست‌به‌چپ تنظیم شده‌اند.
+4. **فرم لاگین مدرن**: فرم ورود بازنویسی شده و دارای کارت مرکزی با استایل سایه‌دار، آیکون اختصاصی سپر امنیتی، فیلد کپچای تصویری زنده با دکمه تجدید، اعتبارسنجی آنی و راهنمای حساب‌های کاربری پیش‌فرض است.
 
 ---
 
-## 🎨 طراحی رابط کاربری و تجربه کاربری (UI/UX)
+## 🔒 امنیت، رمزنگاری و احراز هویت
 
-- **کاملاً فارسی و راست‌چین (RTL)**: تعریف هوشمندانه جهت صفحه و فونت **وزیرمتن (Vazirmatn)** در تمام سطوح.
-- **طراحی مدرن کارت‌ها و گریدها**: بهره‌گیری از سایه‌های ملایم، ترانزیشن‌های روان و خطوط تفکیک‌کننده استاندارد Lumo.
-- **StatusBadge**: برچسب‌های رنگی چشم‌نواز برای نمایش وضعیت‌ها (سبز برای فعال، قرمز برای غیرفعال، زرد برای قفل یا هشدار).
-- **دیالوگ‌های هوشمند (`EntityModal` و `ConfirmDialog`)**: تجربه سریع، مدرن و هماهنگ با طراحی مدرن وب بدون رفرش صفحه.
+معماری امنیتی سیستم بر اساس چندلایه دفاعی عمیق (Defense in Depth) طراحی شده است:
+
+1. **رمزنگاری نامتقارن RSA در ارسال فرم ورود**:
+   - در لحظه لود فرم لاگین، کلید عمومی RSA از سرور دریافت می‌شود.
+   - اطلاعات کاربر شامل `username|password|requestTime|captchaId|captchaAnswer` در سمت کلاینت با RSA رمزنگاری شده و به صورت Base64 به اندپوینت `/v1/token` ارسال می‌گردد.
+   - این مکانیزم حتی در صورت شنود مسیر، مانع از افشای نام کاربری یا رمز عبور می‌شود.
+2. **محافظت در برابر حملات Replay**:
+   - سرور بازه زمانی `requestTime` را با تایم سرور مقایسه کرده و در صورت انقضا، درخواست را رد می‌کند.
+3. **کپچای یک‌بارمصرف (Single-Use Captcha)**:
+   - کپچا در Redis با زمان انقضا (TTL) دو دقیقه‌ای ذخیره شده و بلافاصله پس از اولین تلاش لاگین (موفق یا ناموفق) حذف می‌گردد تا امکان Brute-Force وجود نداشته باشد.
+4. **رمزنگاری داده‌ها و تنظیمات حساس با Jasypt**:
+   - کلیه پسوردها و کلیدهای پیکربندی در فایل‌های YAML با الگوریتم `PBEWITHHMACSHA512ANDAES_256` و مسترکی رمزنگاری شده‌اند:
+   ```
+   MASTER_KEY: Lh7^hy(d)T#)j5(*0)a@!f**&_usOp]0}x
+   ```
+5. **توکن‌های JWT و چرخه حیات Refresh Token**:
+   - صدور توکن دسترسی (Access Token) کوتاه‌مدت به همراه Refresh Token امن.
+   - ثبت توکن‌های منقضی در بلک‌لیست Redis جهت امکان خروج فوری کاربر (Logout).
 
 ---
 
-## 🚀 راهنمای راه‌اندازی و اجرا
+## 🌐 میکروسرویس‌ها، پورت‌ها و اندپوینت‌ها
 
-### پیش‌نیازها
-- **Java 21**
-- **Docker & Docker Compose** (برای PostgreSQL و Redis)
+| نام سرویس | نام کانتینر | پورت داخلی | پورت هاست | شرح وظیفه |
+| :--- | :--- | :--- | :--- | :--- |
+| **PostgreSQL** | `vertex-postgres` | `5432` | `5434` | پایگاه داده رابطه‌ای اصلی (کاربران، نقش‌ها، دسترسی‌ها) |
+| **Redis Stack** | `vertex-redis` | `6379` | `6379` | کش توزیع‌شده، ردیس‌سرچ، اسناد JSON، کپچا و کلیدهای RSA |
+| **Eureka Server** | `vertex-eureka` | `7801` | `7801` | سرور ثبت و کشف سرویس‌ها (Service Discovery) |
+| **Config Server** | `vertex-config` | `8888` | `8888` | سرور متمرکز توزیع فایل‌های پیکربندی و سکرت‌ها |
+| **OAuth Server** | `vertex-oauth` | `7901` | `7901` | سرور صدور توکن، مدیریت کاربر، Liquibase، کپچا و اعتبارسنجی |
+| **Stellar UI** | `vertex-ui` | `7802` | `7802` | پنل مدیریت تحت وب با فریم‌ورک Vaadin Flow و تم لومو |
+| **Gateway Server** | `vertex-gateway` | `8080` | `8085` | درگاه ورودی یکپارچه سیستم با هدایت پویای مسیرها |
 
-### ترتیب اجرای میکروسرویس‌ها
+> [!NOTE]
+> با توجه به مشغول بودن پورت‌های `5432` و `8080` روی هاست، پورت پستگرس به `5434` و پورت گیت‌وی به `8085` مپ شده‌اند. در داخل شبکه داخلی داکر، کلیه سرویس‌ها با پورت‌های استاندارد با یکدیگر تبادل اطلاعات می‌کنند.
 
+---
+
+## 🛠 گلوگاه‌ها و باگ‌های رفع‌شده
+
+در جریان بررسی و بازسازی کامل پروژه، مشکلات و گلوگاه‌های زیر شناسایی و مرتفع گردیدند:
+
+1. **شکست در بالا آمدن Config Server**:
+   - *علت*: آدرس ریپازیتوری کانفیگ به یک مسیر محلی غایب (`file:///home/dev/workspace/gitea/app`) هاردکد شده بود.
+   - *راهکار*: سکرت‌های Jasypt با استفاده از مسترکی دکریپت شدند و ساختار پوشه‌های کانفیگ استانداردسازی شد تا سرور کانفیگ هم از `classpath:/config/` و هم از حجم مونت‌شده داکر فایل‌ها را بخواند.
+2. **عدم انطباق اسپرینگ مدولیت و پکیج‌بندی**:
+   - وابستگی‌های Spring Modulith نسخه `2.1.3` اضافه شد و ماژول‌ها تست و تأیید شدند.
+3. **خطای پکیج‌های منسوخ‌شده Apache Commons**:
+   - `org.apache.commons.lang` به نسخه مدرن `org.apache.commons.lang3.StringUtils` مهاجرت داده شد.
+4. **توقف راه‌اندازی OAuth به دلیل اسناد ردیس (Redis OM Entity Id)**:
+   - *علت*: کلاس `CodeTypeDocument` به اشتباه از `jakarta.persistence.Id` استفاده می‌کرد که باعث پرتاب استثنای `NoSuchElementException: No value present` در متد `saveAll` ردیس می‌شد.
+   - *راهکار*: با انوتیشن استاندارد `org.springframework.data.annotation.Id` و استفاده از ایمیج `redis/redis-stack-server:latest` مشکل به طور ریشه‌ای حل شد و سینک داده‌های پایه به صورت کامپوننت امن (Safe-runner) پیاده‌سازی گردید.
+5. **خطای مسیرهای Gateway و نبود LoadBalancer**:
+   - *علت*: ساختار YAML گیت‌وی در اسپرینگ کلود نسخه جدید تغییر یافته بود و پکیج `spring-cloud-starter-loadbalancer` غایب بود.
+   - *راهکار*: پکیج لودبالانسر اضافه شد و روت‌های گیت‌وی با کلاس جاوا `RouteLocatorBuilder` به شکلی کامپایلری و تضمین‌شده پیاده‌سازی شدند.
+6. **ایجاد خودکار کاربران پیش‌فرض**:
+   - به طور خودکار کاربران `admin` و `dev` با متد `BCrypt` هش شده و در پایگاه داده ایجاد/بررسی می‌شوند.
+
+---
+
+## 🚀 راهنمای راه‌اندازی سریع با Docker Compose
+
+### پیش‌نیازها:
+- داکر (`Docker 24+`) و `docker compose`
+
+### گام‌های اجرا:
+
+۱. **کلون یا ورود به مسیر پروژه**:
 ```bash
-# ۱. راه‌اندازی پایگاه داده و ردیس
-docker run --name vertex-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:latest
-docker run --name vertex-redis -p 6379:6379 -d redis:latest
+cd /home/ubuntu/workspace/vertex
+```
 
-# ۲. بیلد و پابلیش ماژول‌های اشتراکی در ریپازیتوری لوکال
-cd /home/dev/workspace/vertex/core && ./gradlew publishToMavenLocal
-cd /home/dev/workspace/vertex/backend-core && ./gradlew publishToMavenLocal
-cd /home/dev/workspace/vertex/stellar-ui && ./gradlew publishToMavenLocal
+۲. **راه‌اندازی تمامی سرویس‌ها**:
+```bash
+docker compose up -d
+```
 
-# ۳. اجرای سرورهای زیرساختی به ترتیب
-cd /home/dev/workspace/vertex/eureka-server && ./gradlew bootRun
-cd /home/dev/workspace/vertex/config-server && ./gradlew bootRun
-cd /home/dev/workspace/vertex/gateway-server && ./gradlew bootRun
+۳. **مشاهده وضعیت کانتینرها**:
+```bash
+docker compose ps
+```
+خروجی مورد انتظار:
+```text
+NAME              STATUS
+vertex-postgres   Up (healthy)
+vertex-redis      Up (healthy)
+vertex-eureka     Up
+vertex-config     Up
+vertex-oauth      Up
+vertex-ui         Up
+vertex-gateway    Up
+```
 
-# ۴. اجرای سرور احراز هویت
-cd /home/dev/workspace/vertex/oauth-server && ./gradlew bootRun
-
-# ۵. اجرای پنل مدیریت وادین
-cd /home/dev/workspace/vertex/stellar-oauth && ./gradlew bootRun
+۴. **مشاهده لاگ‌های زنده یک سرویس خاص**:
+```bash
+docker compose logs -f oauth-server
+docker compose logs -f stellar-oauth
+docker compose logs -f gateway-server
 ```
 
 ---
 
-## 📚 مستندات تکمیلی و DevOps
+## 🧪 تست و راستی‌آزمایی سرویس‌ها
 
-جهت دسترسی به راهنمای جامع دِواپس، اسکریپت‌های لینوکس، تونل معکوس SSH، دستورات داکر و بک‌آپ دیتابیس که پیش‌تر تدوین شده بودند، فایل زیر را مطالعه فرمایید:
+### ۱. ورود به پنل مدیریت از طریق مرورگر:
+- **از طریق گیت‌وی**: `http://<IP-OR-LOCALHOST>:8085/login`
+- **مستقیم روی وب‌سرور وادین**: `http://<IP-OR-LOCALHOST>:7802/login`
 
-👉 **[راهنمای جامع DevOps، لینوکس و زیرساخت (DEVOPS_AND_SYSADMIN_GUIDE.md)](./DEVOPS_AND_SYSADMIN_GUIDE.md)**
+### ۲. اطلاعات ورود پیش‌فرض (Default Credentials):
+- **نام کاربری**: `admin` | **کلمه عبور**: `admin`
+- **نام کاربری**: `dev` | **کلمه عبور**: `dev`
+
+### ۳. تست اندپوینت‌های REST از طریق ترمینال (cURL):
+
+- **دریافت کلید عمومی RSA**:
+```bash
+curl -s http://localhost:8085/oauth/v1/public-key
+```
+
+- **دریافت تصویر و شناسه کپچا**:
+```bash
+curl -s http://localhost:8085/oauth/v1/captcha
+```
+
+- **بررسی سرویس‌های رجیستر شده در Eureka**:
+```bash
+curl -s http://localhost:7801/eureka/apps
+```
+
+- **بررسی سلامت گیت‌وی**:
+```bash
+curl -s http://localhost:8085/actuator/health
+```
+
+---
+
+## 📚 اطلاعات تکمیلی و راهنمای دوآپس
+
+یادداشت‌ها و راهنمای عملیاتی مدیریت لینوکس، پیکربندی آلترناتیوهای جاوا، تنظیمات SSH تونلینگ، پشتیبان‌گیری از دیتابیس و مدیریت سرور در سندی مجزا با نام زیر نگهداری می‌شود:
+- [📄 راهنمای دوآپس و مدیریت سرور (DEVOPS_AND_SYSADMIN_GUIDE.md)](file:///home/ubuntu/workspace/vertex/DEVOPS_AND_SYSADMIN_GUIDE.md)
+
+---
+<div align="center">
+طراحی و پیاده‌سازی شده با ☕ و افتخار برای اکوسیستم جاوا و اسپرینگ
+</div>

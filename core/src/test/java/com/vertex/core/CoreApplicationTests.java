@@ -1,13 +1,14 @@
 package com.vertex.core;
 
+import com.vertex.core.util.CharacterUtil;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 class CoreApplicationTests {
 
     @Test
-    void contextLoads() {
+    void testCoreCharacterUtil() {
+        assertEquals("علی", CharacterUtil.handleSpecialPersianChars("علي"));
     }
 
 }

@@ -1,6 +1,24 @@
 spring:
   application:
     name: OAUTH-UI-SERVICE
+  cloud:
+    compatibility-verifier:
+      enabled: false
   config:
     import:
-      - optional:configserver:http://vertex:8888/
+      - optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888/}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: ${SERVER_PORT:7802}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:7801/eureka/}
+
+vaadin:
+  launch-browser: false

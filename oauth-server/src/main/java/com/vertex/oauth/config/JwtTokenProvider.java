@@ -7,7 +7,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,8 +33,8 @@ public class JwtTokenProvider {
     private final CacheService cacheService;
 
     public JwtTokenProvider(
-            @Value("${security.password.secret-key}") String secretKey,
-            @Value("${security.token.expiration-time}") long expirationTime,
+            @Value("${security.password.secret-key:1mnv84&0J7*cry5Yv1@@1F@7Ygx$kXW2~3}") String secretKey,
+            @Value("${security.token.expiration-time:14400000}") long expirationTime,
             UserDetailsService userDetailsService,
             CacheService cacheService
     ) {

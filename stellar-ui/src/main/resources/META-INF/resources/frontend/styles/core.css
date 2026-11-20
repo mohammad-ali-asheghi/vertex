@@ -23,11 +23,7 @@
 }
 
 :root {
-    --lumo-font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    --lumo-primary-color: #2563eb;
-    --lumo-primary-text-color: #1d4ed8;
-    --lumo-primary-color-50pct: rgba(37, 99, 235, 0.5);
-    --lumo-primary-color-10pct: rgba(37, 99, 235, 0.1);
+    --lumo-font-family: 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --lumo-border-radius-m: 8px;
     --lumo-border-radius-l: 12px;
 }
@@ -43,6 +39,7 @@ html {
 body {
     margin: 0;
     padding: 0;
+    font-family: var(--lumo-font-family);
     background-color: var(--lumo-contrast-5pct);
 }
 
@@ -51,17 +48,17 @@ body {
     background: var(--lumo-base-color);
     border: 1px solid var(--lumo-contrast-10pct);
     border-radius: var(--lumo-border-radius-l);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    box-shadow: var(--lumo-box-shadow-xs);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     padding: var(--lumo-space-m);
 }
 
 .vertex-card:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--lumo-box-shadow-s);
     border-color: var(--lumo-contrast-20pct);
 }
 
-/* Metric / Stats Card */
+/* Stat KPI Card */
 .stat-card {
     background: var(--lumo-base-color);
     border: 1px solid var(--lumo-contrast-10pct);
@@ -77,7 +74,7 @@ body {
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--lumo-box-shadow-m);
 }
 
 .stat-card::before {
@@ -87,7 +84,7 @@ body {
     right: 0;
     left: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--lumo-primary-color), #60a5fa);
+    background: linear-gradient(90deg, var(--lumo-primary-color), var(--lumo-primary-color-50pct));
 }
 
 /* Data grid enhancements */
@@ -95,7 +92,6 @@ vaadin-grid {
     border-radius: var(--lumo-border-radius-l);
     border: 1px solid var(--lumo-contrast-10pct);
     background: var(--lumo-base-color);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 vaadin-grid::part(header-cell) {
@@ -103,13 +99,4 @@ vaadin-grid::part(header-cell) {
     font-weight: 600;
     color: var(--lumo-secondary-text-color);
     font-size: var(--lumo-font-size-s);
-}
-
-/* Glassmorphic card */
-.glass-panel {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }

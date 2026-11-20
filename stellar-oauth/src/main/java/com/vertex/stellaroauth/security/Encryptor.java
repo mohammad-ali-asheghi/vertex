@@ -2,7 +2,9 @@ package com.vertex.stellaroauth.security;
 
 import com.vertex.core.config.CommonConstant;
 import com.vertex.core.config.MessageProvider;
-import lombok.RequiredArgsConstructor;
+import com.vertex.stellaroauth.service.TokenClient;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -20,16 +22,41 @@ import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
+@Slf4j
 @Component
-@RequiredArgsConstructor
 public class Encryptor {
 
     private final StringRedisTemplate redisTemplate;
+    private final TokenClient tokenClient;
+
+    public Encryptor(StringRedisTemplate redisTemplate, @Lazy TokenClient tokenClient) {
+        this.redisTemplate = redisTemplate;
+        this.tokenClient = tokenClient;
+    }
 
     public String encryptData(String username, String password, String captchaId, String captchaAnswer) {
-        String publicKeyBase64 = redisTemplate.opsForValue().get(CommonConstant.PUBLIC_KEY);
+        String publicKeyBase64 = null;
+        try {
+            if (redisTemplate != null) {
+                publicKeyBase64 = redisTemplate.opsForValue().get(CommonConstant.PUBLIC_KEY);
+            }
+        } catch (Exception ex) {
+            log.warn("Redis read for public key failed: {}", ex.getMessage());
+        }
+
         if (publicKeyBase64 == null || publicKeyBase64.isBlank()) {
-            throw new IllegalStateException(MessageProvider.getMessageByKey("PublicKeyNotFound"));
+            try {
+                publicKeyBase64 = tokenClient.getPublicKey();
+                if (publicKeyBase64 != null && !publicKeyBase64.isBlank() && redisTemplate != null) {
+                    redisTemplate.opsForValue().set(CommonConstant.PUBLIC_KEY, publicKeyBase64);
+                }
+            } catch (Exception ex) {
+                log.warn("Fetch public key from TokenClient failed: {}", ex.getMessage());
+            }
+        }
+
+        if (publicKeyBase64 == null || publicKeyBase64.isBlank()) {
+            throw new IllegalStateException("کلید عمومی RSA یافت نشد. لطفاً مطمئن شوید سرویس احراز هویت اجرا شده است.");
         }
 
         try {

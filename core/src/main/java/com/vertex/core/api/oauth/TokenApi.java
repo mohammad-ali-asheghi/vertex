@@ -24,4 +24,7 @@ public interface TokenApi {
 
     @GetMapping(value = {"/v1/captcha"}, produces = MediaType.APPLICATION_JSON_VALUE)
     RestResponse<CaptchaResponse> getCaptcha();
+
+    @GetMapping(value = {"/v1/public-key"}, produces = MediaType.TEXT_PLAIN_VALUE)
+    String getPublicKey();
 }

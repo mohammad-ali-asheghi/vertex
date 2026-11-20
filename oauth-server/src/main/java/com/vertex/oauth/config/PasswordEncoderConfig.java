@@ -14,10 +14,10 @@ import java.util.Objects;
 @Configuration
 public class PasswordEncoderConfig {
 
-    @Value("${security.password.encode-key}")
+    @Value("${security.password.encode-key:4n*&9L^rXdIZ4dcz6S!0*qMdZ8Y2CWJ8!9}")
     private String ENCODE_KEY;
 
-    @Value("${security.algorithm.encode-alg}")
+    @Value("${security.algorithm.encode-alg:HmacSHA256}")
     private String ENCODE_ALGORITHM;
 
     @Bean

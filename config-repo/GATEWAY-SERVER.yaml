@@ -1,0 +1,29 @@
+spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    gateway:
+      routes:
+        - id: oauth-server
+          uri: lb://OAUTH-SERVER
+          predicates:
+            - Path=/oauth/**
+          filters:
+            - RewritePath=/oauth/(?<path>.*), /${path}
+        - id: oauth-ui-service
+          uri: lb://OAUTH-UI-SERVICE
+          predicates:
+            - Path=/**
+
+server:
+  port: 8080
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:7801/eureka/}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,refresh

@@ -1,0 +1,21 @@
+spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: ${SERVER_PORT:7802}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:7801/eureka/}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,refresh

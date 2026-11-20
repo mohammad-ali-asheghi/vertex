@@ -31,7 +31,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     public AuthenticationFilter(
-            @Value("${security.password.secret-key}") String secretKey,
+            @Value("${security.password.secret-key:1mnv84&0J7*cry5Yv1@@1F@7Ygx$kXW2~3}") String secretKey,
             @Lazy JwtTokenProvider jwtTokenProvider,
             UserDetailsService userDetailsService
     ) {

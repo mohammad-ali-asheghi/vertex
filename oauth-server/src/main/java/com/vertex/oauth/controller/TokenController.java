@@ -15,7 +15,7 @@ import com.vertex.core.util.RestResponse;
 import com.vertex.oauth.config.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -135,6 +135,23 @@ public class TokenController implements TokenApi {
     }
 
     @Override
+    public String getPublicKey() {
+        String pub = cacheService.getCacheByKey(CommonConstant.PUBLIC_KEY);
+        if (pub == null || pub.isBlank()) {
+            try {
+                java.security.KeyPair pair = com.vertex.backendcore.security.CryptoUtil.generateRsaKeyPair();
+                pub = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
+                String priv = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
+                cacheService.setCache(CommonConstant.PUBLIC_KEY, pub);
+                cacheService.setCache(CommonConstant.PRIVATE_KEY, priv);
+            } catch (Exception e) {
+                log.error("Failed to generate RSA keypair in getPublicKey", e);
+            }
+        }
+        return pub;
+    }
+
+    @Override
     public RestResponse<CaptchaResponse> getCaptcha() {
         String captchaText = captchaGeneratorService.generateRandomText();
         String captchaId = UUID.randomUUID().toString();
@@ -167,22 +184,58 @@ public class TokenController implements TokenApi {
     }
 
     private SecurityInfo decrypt(String encryptedBase64) {
-        byte[] encryptedBytes = Base64.getDecoder().decode(encryptedBase64);
+        if (encryptedBase64 == null || encryptedBase64.isBlank()) {
+            throw new ServiceException(MessageProvider.getMessageByKey("RequiredFieldEmpty"));
+        }
+        encryptedBase64 = encryptedBase64.trim();
+        if (encryptedBase64.startsWith("\"") && encryptedBase64.endsWith("\"")) {
+            encryptedBase64 = encryptedBase64.substring(1, encryptedBase64.length() - 1);
+        }
+        encryptedBase64 = encryptedBase64.replaceAll("\\s+", "");
+
+        byte[] encryptedBytes;
+        try {
+            encryptedBytes = Base64.getDecoder().decode(encryptedBase64);
+        } catch (IllegalArgumentException e) {
+            log.error("Failed to base64-decode encrypted login payload: {}", e.getMessage());
+            throw new ServiceException(MessageProvider.getMessageByKey("InternalServerError"));
+        }
+
         String privateKey = cacheService.getCacheByKey(CommonConstant.PRIVATE_KEY);
         if (privateKey == null || privateKey.isBlank()) {
-            throw new ServiceException(MessageProvider.getMessageByKey("PrivateKeyNotFound"));
+            log.warn("Private RSA key not found in Redis, regenerating keypair on demand");
+            try {
+                java.security.KeyPair pair = com.vertex.backendcore.security.CryptoUtil.generateRsaKeyPair();
+                String pub = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
+                privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
+                cacheService.setCache(CommonConstant.PUBLIC_KEY, pub);
+                cacheService.setCache(CommonConstant.PRIVATE_KEY, privateKey);
+            } catch (Exception ex) {
+                log.error("Failed to generate RSA keypair on demand", ex);
+                throw new ServiceException(MessageProvider.getMessageByKey("PrivateKeyNotFound"));
+            }
         }
+
         byte[] decryptedBytes = decryptWithPrivateRsaKey(
                 encryptedBytes,
                 privateKey,
                 CommonConstant.INSTANCE_KEY
         );
         String decryptedData = new String(decryptedBytes, StandardCharsets.UTF_8);
-        String[] data = decryptedData.split("\\|");
-        LocalDateTime requestTime = LocalDateTime.parse(data[2]);
+        String[] data = decryptedData.split("\\|", 5);
 
-        if (requestTime.isAfter(LocalDateTime.now().plusSeconds(expirationRequestTime)))
+        LocalDateTime requestTime;
+        try {
+            requestTime = LocalDateTime.parse(data[2]);
+        } catch (Exception ex) {
+            requestTime = LocalDateTime.now();
+        }
+
+        if (requestTime.isBefore(LocalDateTime.now().minusSeconds(expirationRequestTime))
+                || requestTime.isAfter(LocalDateTime.now().plusSeconds(expirationRequestTime))) {
+            log.warn("Request timed out for user attempt: {}", data[0]);
             throw new ServiceException(MessageProvider.getMessageByKey("RequestTimeout"));
+        }
 
         String captchaId = data.length > 3 ? data[3] : null;
         String captchaAnswer = data.length > 4 ? data[4] : null;

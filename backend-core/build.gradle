@@ -20,7 +20,7 @@ jar {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -32,16 +32,6 @@ configurations {
 
 repositories {
     mavenLocal()
-    maven {
-        name = "nexus"
-        url = uri("http://localhost:7900/repository/maven-releases/")
-        allowInsecureProtocol = true
-
-        credentials {
-            username = project.findProperty("nexus_username") ?: "admin"
-            password = project.findProperty("nexus_password") ?: "admin"
-        }
-    }
     mavenCentral()
 }
 

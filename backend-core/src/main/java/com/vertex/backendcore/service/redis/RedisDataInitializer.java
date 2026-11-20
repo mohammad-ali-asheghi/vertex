@@ -42,9 +42,21 @@ public class RedisDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        syncData(CODE_TYPE_FILE_NAME, CodeTypeDocument.class);
-        syncData(CODE_TYPE_ITEM_FILE_NAME, CodeTypeItemDocument.class);
-        generatedKey();
+        try {
+            syncData(CODE_TYPE_FILE_NAME, CodeTypeDocument.class);
+        } catch (Exception e) {
+            System.err.println("⚠️ Warning: Could not initialize " + CODE_TYPE_FILE_NAME + ": " + e.getMessage());
+        }
+        try {
+            syncData(CODE_TYPE_ITEM_FILE_NAME, CodeTypeItemDocument.class);
+        } catch (Exception e) {
+            System.err.println("⚠️ Warning: Could not initialize " + CODE_TYPE_ITEM_FILE_NAME + ": " + e.getMessage());
+        }
+        try {
+            generatedKey();
+        } catch (Exception e) {
+            System.err.println("⚠️ Warning: Could not generate/verify RSA keys: " + e.getMessage());
+        }
     }
 
     private void generatedKey() {

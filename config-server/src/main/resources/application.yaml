@@ -5,12 +5,16 @@ spring:
     active:
       - native
   cloud:
+    compatibility-verifier:
+      enabled: false
     config:
       name: vertex
       server:
         native:
           search-locations:
-            - ENC(trK06WjYBgVn/GJf656xL+NhLb0tLOWobVooyI9l3CBgHNJz1K6Nah0+aXCIBFMlGxmZE7CNiJYE0E400lyg5qArHHoPQswKNfchLhTofcM=)
+            - classpath:/config/
+            - file:./config-repo/
+            - file:/app/config/
 
 server:
   port: 8888

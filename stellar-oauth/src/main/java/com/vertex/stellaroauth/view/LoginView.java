@@ -75,8 +75,7 @@ public class LoginView extends VerticalLayout implements HasDynamicTitle {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
-
-        getStyle().set("background", "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)");
+        getStyle().set("background", "radial-gradient(circle at 50% 20%, var(--lumo-primary-color-10pct), var(--lumo-contrast-5pct) 70%)");
     }
 
     private void createCustomForm() {
@@ -85,36 +84,44 @@ public class LoginView extends VerticalLayout implements HasDynamicTitle {
                 "login-card",
                 LumoUtility.Background.BASE,
                 LumoUtility.BorderRadius.LARGE,
-                LumoUtility.BoxShadow.XLARGE,
-                LumoUtility.Padding.LARGE
+                LumoUtility.BoxShadow.LARGE,
+                LumoUtility.Padding.XLARGE
         );
         card.setWidth("420px");
+        card.setMaxWidth("92vw");
         card.setAlignItems(Alignment.STRETCH);
 
+        Icon logoIcon = VaadinIcon.SHIELD.create();
+        logoIcon.setSize("40px");
+        logoIcon.setColor("var(--lumo-primary-color)");
+        HorizontalLayout logoWrapper = new HorizontalLayout(logoIcon);
+        logoWrapper.setWidthFull();
+        logoWrapper.setJustifyContentMode(JustifyContentMode.CENTER);
+
         H1 title = new H1(getTranslation("WelcomeApp"));
-        title.addClassNames(LumoUtility.TextAlignment.CENTER, LumoUtility.Margin.Top.NONE, LumoUtility.FontSize.XXLARGE);
+        title.addClassNames(LumoUtility.TextAlignment.CENTER, LumoUtility.Margin.Top.XSMALL, LumoUtility.FontSize.XXLARGE);
 
         Paragraph subtitle = new Paragraph(getTranslation("EnterYourInformation"));
-        subtitle.addClassNames(LumoUtility.TextAlignment.CENTER, LumoUtility.TextColor.SECONDARY, LumoUtility.Margin.Bottom.LARGE);
+        subtitle.addClassNames(LumoUtility.TextAlignment.CENTER, LumoUtility.TextColor.SECONDARY, LumoUtility.Margin.Bottom.MEDIUM);
 
         usernameField = new TextField(getTranslation("Username"));
         usernameField.setPrefixComponent(new Icon(VaadinIcon.USER));
-        usernameField.addClassName("ltr-inputs");
+        usernameField.setPlaceholder("مثلاً admin یا dev");
 
         passwordField = new PasswordField(getTranslation("Password"));
         passwordField.setPrefixComponent(new Icon(VaadinIcon.LOCK));
-        passwordField.addClassName("ltr-inputs");
+        passwordField.setPlaceholder("کلمه عبور");
 
         captchaField = new TextField(getTranslation("CaptchaCode"));
-        captchaField.addClassName("ltr-inputs");
-        captchaField.setPlaceholder("مثلاً X7Y2Z");
+        captchaField.setPlaceholder("کد امنیتی ۵ رقمی");
 
         captchaImage = new Image();
         captchaImage.setHeight("40px");
         captchaImage.setWidth("120px");
-        captchaImage.getStyle().set("border-radius", "4px").set("border", "1px solid var(--lumo-contrast-20pct)");
+        captchaImage.getStyle().set("border-radius", "var(--lumo-border-radius-m)").set("border", "1px solid var(--lumo-contrast-20pct)");
 
         refreshCaptchaBtn = new Button(new Icon(VaadinIcon.REFRESH));
+        refreshCaptchaBtn.setTooltipText("دریافت تصویر جدید");
         refreshCaptchaBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         refreshCaptchaBtn.addClickListener(e -> refreshCaptcha());
 
@@ -122,14 +129,17 @@ public class LoginView extends VerticalLayout implements HasDynamicTitle {
         captchaLayout.setAlignItems(Alignment.END);
         captchaLayout.setFlexGrow(1, captchaField);
 
-        loginButton = new Button(getTranslation("LoginButton"));
+        loginButton = new Button(getTranslation("LoginButton"), new Icon(VaadinIcon.SIGN_IN));
         loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         loginButton.addClassNames(LumoUtility.Margin.Top.LARGE);
 
         loginButton.addClickShortcut(Key.ENTER);
         loginButton.addClickListener(e -> attemptLogin());
 
-        card.add(title, subtitle, usernameField, passwordField, captchaLayout, loginButton);
+        Paragraph hint = new Paragraph("حساب‌های پیش‌فرض: admin / admin یا dev / dev");
+        hint.addClassNames(LumoUtility.TextAlignment.CENTER, LumoUtility.FontSize.XSMALL, LumoUtility.TextColor.SECONDARY, LumoUtility.Margin.Top.MEDIUM);
+
+        card.add(logoWrapper, title, subtitle, usernameField, passwordField, captchaLayout, loginButton, hint);
         add(card);
     }
 

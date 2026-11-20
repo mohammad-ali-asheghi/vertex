@@ -22,7 +22,7 @@ jar {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -34,16 +34,6 @@ configurations {
 
 repositories {
     mavenLocal()
-    maven {
-        name = "nexus"
-        url = uri("http://localhost:7900/repository/maven-releases/")
-        allowInsecureProtocol = true
-
-        credentials {
-            username = project.findProperty("nexus_username") ?: "admin"
-            password = project.findProperty("nexus_password") ?: "admin"
-        }
-    }
     mavenCentral()
     maven { setUrl("https://maven.vaadin.com/vaadin-addons") }
 }
@@ -68,7 +58,12 @@ dependencies {
     developmentOnly 'com.vaadin:vaadin-dev'
     //*DEFAULT
     testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     //*DEFAULT
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
 publishing {
